@@ -12,7 +12,8 @@ import {
   FileText,
   Truck,
   Moon, 
-  Sun 
+  Sun,
+  ClipboardList // Ícone alternativo para sugestão
 } from "lucide-react";
 
 export function Sidebar() {
@@ -20,7 +21,6 @@ export function Sidebar() {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Garante que o código do tema só rode no navegador (Client Side)
   useEffect(() => {
     setMounted(true);
     const savedTheme = localStorage.getItem("theme");
@@ -51,12 +51,13 @@ export function Sidebar() {
     { name: "Produtos", path: "/produtos", icon: Package },
     { name: "Categorias", path: "/categorias", icon: Tags },
     { name: "Perdas", path: "/perdas", icon: AlertTriangle },
+    // AJUSTE AQUI: Adicionado o path para a tela de sugestão
+    { name: 'Sugestão de Compra', path: '/dashboard/relatorios/compras', icon: ClipboardList },
     { name: "Relatórios", path: "/dashboard/relatorios", icon: FileText },
   ];
 
   return (
     <aside className="w-72 h-screen sticky top-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 transition-colors">
-      {/* LOGOTIPO */}
       <div className="mb-10 px-2">
         <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">
           Premium<span className="text-blue-600">POS</span>
@@ -64,10 +65,13 @@ export function Sidebar() {
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Gestão Inteligente</p>
       </div>
 
-      {/* LINKS DE NAVEGAÇÃO */}
-      <nav className="flex-1 space-y-2">
+      <nav className="flex-1 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
+          // O TypeScript exige que o path exista para o map funcionar corretamente
+          if (!item.path) return null;
+
           const isActive = pathname === item.path;
+          
           return (
             <Link
               key={item.path}
@@ -79,20 +83,23 @@ export function Sidebar() {
               }`}
             >
               <item.icon size={20} />
-              {item.name}
+              <span className="truncate">{item.name}</span>
+              
+              {/* Badge opcional: Mostra um ponto azul se for a tela de sugestão */}
+              {item.name === 'Sugestão de Compra' && (
+                <div className="ml-auto w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* BOTÃO DE TROCA DE TEMA (MODERNO E DISCRETO) */}
       <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
         <button
           onClick={toggleTheme}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-all group"
         >
           <div className="flex items-center gap-3">
-            {/* O ícone só aparece após o mounted para evitar o erro de hidratação */}
             {mounted && (
               isDark ? <Sun className="text-amber-500" size={18} /> : <Moon className="text-blue-600" size={18} />
             )}
@@ -101,7 +108,6 @@ export function Sidebar() {
             </span>
           </div>
           
-          {/* Switch Visual */}
           <div className="w-10 h-5 bg-slate-200 dark:bg-slate-800 rounded-full relative p-1">
             <div className={`w-3 h-3 rounded-full transition-all duration-300 ${isDark ? 'translate-x-5 bg-blue-500' : 'translate-x-0 bg-slate-400'}`} />
           </div>
