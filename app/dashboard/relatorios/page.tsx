@@ -93,7 +93,7 @@ export default function RelatorioVendas() {
                     <p className="font-black text-slate-800 dark:text-white uppercase text-sm italic">{item.desc}</p>
                     <p className="text-[10px] text-slate-400 font-bold">{item.data}</p>
                   </td>
-                  <td className="p-5 text-[10px] font-black text-slate-500 uppercase">{item.pagamento || item.pag || '-'}</td>
+                  <td className="p-5 text-[10px] font-black text-slate-500 uppercase">{item.pagamento || '-'}</td>
                   <td className={`p-5 text-right font-black ${item.tipo === 'ENTRADA' ? 'text-emerald-500' : 'text-rose-500'}`}>
                     {item.tipo === 'ENTRADA' ? '+' : '-'} R$ {Number(item.valor).toFixed(2)}
                   </td>
@@ -128,7 +128,7 @@ export default function RelatorioVendas() {
               <tr key={index} className={index % 2 === 0 ? 'bg-[#f3f4f6]' : 'bg-white'}>
                 <td className="border border-gray-300 py-1.5 px-3 text-[12px] whitespace-nowrap">{item.data}</td>
                 <td className="border border-gray-300 py-1.5 px-3 text-[12px] uppercase">{item.desc}</td>
-                <td className="border border-gray-300 py-1.5 px-3 text-[12px]">{item.pagamento || item.pag || '-'}</td>
+                <td className="border border-gray-300 py-1.5 px-3 text-[12px]">{item.pagamento || '-'}</td>
                 <td className="border border-gray-300 py-1.5 px-3 text-[12px]">{item.tipo}</td>
                 <td className="border border-gray-300 py-1.5 px-3 text-[12px] font-bold text-right">R$ {Number(item.valor).toFixed(2)}</td>
               </tr>
