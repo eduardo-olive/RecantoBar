@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Vamos começar com SQLite por ser mais fácil (gera um arquivo local)
+}
+
+model Produto {
+  id             String   @id @default(cuid())
+  nome           String   @unique
+  categoria      String
+  estoque        Int      @default(0)
+  estoqueMinimo  Int      @default(5)
+  estoqueSeguro  Int      @default(20)
+  precoCusto     Float    @default(0)
+  precoVenda     Float    @default(0)
+  createdAt      DateTime @default(now())
+}
+
+model Movimentacao {
+  id          String   @id @default(cuid())
+  tipo        String   // ENTRADA ou SAIDA
+  desc        String
+  valor       Float
+  pagamento   String?  // PIX, CARTÃO, DINHEIRO
+  data        DateTime @default(now())
+}
