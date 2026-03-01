@@ -20,10 +20,11 @@ export default function ModalVenda({ isOpen, onClose, bebida, onConfirm }: Modal
   const [pagamento, setPagamento] = useState('DINHEIRO');
 
   useEffect(() => {
-    if (isOpen) {
-      setQuantidade(1);
-      setPagamento('DINHEIRO');
-    }
+    if (!isOpen) return;
+
+    setQuantidade(1);
+    setPagamento('DINHEIRO');
+
   }, [isOpen]);
 
   if (!isOpen || !bebida) return null;

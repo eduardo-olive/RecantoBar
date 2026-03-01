@@ -23,7 +23,7 @@ export default function PerdasPage() {
     // Chama a função do Contexto que faz tudo:
     // 1. Baixa estoque | 2. Registra histórico | 3. Lança saída no caixa
     registrarPerda({
-      produtoId: Number(produtoId),
+      produtoId: String(produtoId),
       qtd: Number(quantidade),
       motivo: motivo
     });

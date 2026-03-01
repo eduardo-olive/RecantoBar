@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+interface ItemVenda {
+  produtoId: string;
+  quantidade: number;
+  precoUnitario: number;
+}
+
 export async function POST(request: Request) {
   try {
     const { itens, metodoPagamento } = await request.json();
@@ -29,8 +35,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true }, { status: 201 });
-  } catch (error: any) {
-    console.error("Erro na venda:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (_error: any) {
+    console.error("Erro na venda:", _error);
+    return NextResponse.json({ error: _error.message }, { status: 500 });
   }
 }

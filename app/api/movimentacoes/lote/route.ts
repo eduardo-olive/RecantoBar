@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+interface ItemEstoque {
+  produtoId: string;
+  qtd: number;
+  precoCusto: number;
+  precoVenda: number;
+}
+
 export async function POST(request: Request) {
   try {
     const carrinho = await request.json();
