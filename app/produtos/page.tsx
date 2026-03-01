@@ -1,35 +1,68 @@
 "use client";
 
-import { useData } from '../DataContext';
-import { Plus, Tag, Box, AlertTriangle, BarChart3, TrendingUp } from 'lucide-react'; 
-import { useState } from 'react';
+import { Plus, Tag, Box, AlertTriangle, Inbox, TrendingUp } from 'lucide-react'; 
+import { useState, useEffect } from 'react';
 
 export default function ProdutosPage() {
-  const { categorias, produtos, adicionarProduto } = useData();
+  const [produtos, setProdutos] = useState<any[]>([]);
+  const [categorias, setCategorias] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   
   const [novoProduto, setNovoProduto] = useState({
     nome: "",
     estoqueMinimo: "",
-    estoqueSeguro: "", // Estoque Máximo/Alvo
+    estoqueSeguro: "", 
     categoriaId: "" 
   });
 
-  const handleAdd = (e: React.FormEvent) => {
+  // 1. CARREGAR DADOS DO BANCO
+  async function carregarDados() {
+    try {
+      const [resP, resC] = await Promise.all([
+        fetch('/api/produtos'),
+        fetch('/api/categorias')
+      ]);
+      const dataP = await resP.json();
+      const dataC = await resC.json();
+      if (Array.isArray(dataP)) setProdutos(dataP);
+      if (Array.isArray(dataC)) setCategorias(dataC);
+    } catch (err) {
+      console.error("Erro ao sincronizar dados:", err);
+    }
+  }
+
+  useEffect(() => { carregarDados(); }, []);
+
+  // 2. GRAVAR NO BANCO
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!novoProduto.nome || !novoProduto.categoriaId) return;
+    if (!novoProduto.nome || !novoProduto.categoriaId || loading) return;
 
-    adicionarProduto({
-      nome: novoProduto.nome.toUpperCase(),
-      categoriaId: Number(novoProduto.categoriaId),
-      estoqueMinimo: Number(novoProduto.estoqueMinimo),
-      estoqueSeguro: Number(novoProduto.estoqueSeguro),
-      // Inicializamos valores técnicos como zero para não quebrar outras telas,
-      // mas eles não aparecem nesta interface.
-      preco: 0,
-      precoCusto: 0
-    });
+    setLoading(true);
+    try {
+      const response = await fetch('/api/produtos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: novoProduto.nome.toUpperCase(),
+          categoriaId: novoProduto.categoriaId,
+          estoqueMinimo: Number(novoProduto.estoqueMinimo) || 0,
+          estoqueSeguro: Number(novoProduto.estoqueSeguro) || 0,
+          estoque: 0,       // Inicializa estoque zerado no banco
+          precoVenda: 0,    // Valores padrão conforme seu schema
+          precoCusto: 0
+        }),
+      });
 
-    setNovoProduto({ nome: "", estoqueMinimo: "", estoqueSeguro: "", categoriaId: "" });
+      if (response.ok) {
+        setNovoProduto({ nome: "", estoqueMinimo: "", estoqueSeguro: "", categoriaId: "" });
+        carregarDados(); // Atualiza a lista
+      }
+    } catch (err) {
+      alert("Erro ao registrar produto no banco.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,7 +72,7 @@ export default function ProdutosPage() {
         <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Definição de Itens e Metas de Inventário</p>
       </header>
 
-      {/* FORMULÁRIO - Focado apenas em Identificação e Estoque */}
+      {/* FORMULÁRIO */}
       <section className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
         <form onSubmit={handleAdd} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,12 +82,14 @@ export default function ProdutosPage() {
               value={novoProduto.nome}
               onChange={(e) => setNovoProduto({...novoProduto, nome: e.target.value})}
               className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white border border-transparent focus:border-emerald-500 transition-all"
+              required
             />
             
             <select 
               value={novoProduto.categoriaId}
               onChange={(e) => setNovoProduto({...novoProduto, categoriaId: e.target.value})}
               className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white cursor-pointer border border-transparent focus:border-emerald-500"
+              required
             >
               <option value="">SELECIONE A CATEGORIA</option>
               {categorias.map(cat => (
@@ -86,14 +121,18 @@ export default function ProdutosPage() {
               <TrendingUp className="absolute right-4 top-4 text-emerald-500 opacity-20" size={18} />
             </div>
 
-            <button type="submit" className="bg-emerald-600 text-white p-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
-              <Plus size={18} /> Registrar Item
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="bg-emerald-600 text-white p-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+            >
+              <Plus size={18} /> {loading ? "Registrando..." : "Registrar Item"}
             </button>
           </div>
         </form>
       </section>
 
-      {/* LISTAGEM - Visualização de Fluxo de Estoque */}
+      {/* LISTAGEM */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
         <table className="w-full text-left">
           <thead>
@@ -105,37 +144,47 @@ export default function ProdutosPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-            {produtos.map((prod) => {
-              const cat = categorias.find(c => c.id === prod.categoriaId);
-              const saldo = prod.estoque || 0;
-              const isCritico = saldo <= prod.estoqueMinimo;
+            {produtos.length === 0 ? (
+               <tr>
+                 <td colSpan={4} className="py-20 text-center">
+                    <div className="flex flex-col items-center justify-center text-slate-400">
+                      <Inbox size={48} className="mb-4 opacity-20" />
+                      <p className="font-bold uppercase tracking-widest text-xs">Nenhum produto no banco</p>
+                    </div>
+                 </td>
+               </tr>
+            ) : (
+              produtos.map((prod) => {
+                const saldo = prod.estoque || 0;
+                const isCritico = saldo <= prod.estoqueMinimo;
 
-              return (
-                <tr key={prod.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="p-6">
-                    <p className="font-black text-slate-800 dark:text-white uppercase text-sm italic">{prod.nome}</p>
-                  </td>
-                  <td className="p-6">
-                    <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-[10px] font-black text-slate-500 uppercase">
-                      {cat ? cat.nome : "NÃO DEFINIDO"}
-                    </span>
-                  </td>
-                  <td className="p-6">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-400">
-                      <span className="text-amber-600">{prod.estoqueMinimo}</span>
-                      <span>/</span>
-                      <span className="text-emerald-600">{prod.estoqueSeguro}</span>
-                    </div>
-                  </td>
-                  <td className="p-6 text-right">
-                    <div className={`inline-flex items-center gap-2 font-black italic text-lg ${isCritico ? 'text-rose-500' : 'text-emerald-500'}`}>
-                      {isCritico && <AlertTriangle size={14} className="animate-pulse" />}
-                      {saldo} <span className="text-[10px] uppercase not-italic ml-1">UN</span>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr key={prod.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="p-6">
+                      <p className="font-black text-slate-800 dark:text-white uppercase text-sm italic">{prod.nome}</p>
+                    </td>
+                    <td className="p-6">
+                      <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-[10px] font-black text-slate-500 uppercase">
+                        {prod.categoria?.nome || "NÃO DEFINIDO"}
+                      </span>
+                    </td>
+                    <td className="p-6">
+                      <div className="flex items-center gap-2 text-[10px] font-black text-slate-400">
+                        <span className="text-amber-600">{prod.estoqueMinimo}</span>
+                        <span>/</span>
+                        <span className="text-emerald-600">{prod.estoqueSeguro}</span>
+                      </div>
+                    </td>
+                    <td className="p-6 text-right">
+                      <div className={`inline-flex items-center gap-2 font-black italic text-lg ${isCritico ? 'text-rose-500' : 'text-emerald-500'}`}>
+                        {isCritico && <AlertTriangle size={14} className="animate-pulse" />}
+                        {saldo} <span className="text-[10px] uppercase not-italic ml-1">UN</span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
