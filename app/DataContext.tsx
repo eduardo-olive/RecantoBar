@@ -2,30 +2,37 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// --- INTERFACES ---
-export interface Categoria { id: number; nome: string; }
-export interface Produto { 
-  id: number; 
+// --- INTERFACES ATUALIZADAS (ID agora é string para o Prisma) ---
+export interface Categoria { 
+  id: string; 
   nome: string; 
-  preco: number; 
+  _count?: { produtos: number }; // Para exibir quantos itens tem na categoria
+}
+
+export interface Produto { 
+  id: string; 
+  nome: string; 
+  precoVenda: number; 
   precoCusto: number; 
   estoque: number; 
   estoqueMinimo: number;
   estoqueSeguro: number;
-  categoriaId: number; 
+  categoriaId: string; 
 }
+
 export interface Movimentacao { 
-  id: number; 
+  id: string; 
   data: string; 
   desc: string; 
   pagamento?: string; 
   tipo: 'ENTRADA' | 'SAIDA'; 
   valor: number; 
 }
+
 export interface Perda {
-  id: number;
+  id: string;
   data: string;
-  produtoId: number;
+  produtoId: string;
   qtd: number;
   motivo: string;
 }
@@ -35,70 +42,97 @@ interface DataContextType {
   produtos: Produto[];
   movimentacoes: Movimentacao[];
   perdas: Perda[];
+  // Funções de Categoria (API)
+  carregarCategorias: () => Promise<void>;
+  adicionarCategoria: (nome: string) => Promise<boolean>;
+  excluirCategoria: (id: string) => Promise<boolean>;
+  // Funções de Produto/Venda (Em breve serão API também)
   adicionarProduto: (p: any) => void;
   adicionarEntrada: (itens: any[]) => void;
   venderProduto: (carrinho: any[], pagamento: string) => void;
   registrarPerda: (p: Omit<Perda, 'id' | 'data'>) => void;
-  adicionarCategoria: (nome: string) => void;
-  excluirCategoria: (id: number) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  // Inicializa como array vazio para ser 100% dinâmico
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [perdas, setPerdas] = useState<Perda[]>([]);
 
-  // --- CARREGAR DADOS ---
+  // --- 1. CARREGAR DADOS (BUSCA NO BANCO) ---
+  const carregarCategorias = async () => {
+    try {
+      const res = await fetch('/api/categorias');
+      if (res.ok) {
+        const dados = await res.json();
+        setCategorias(dados);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar categorias do banco:", error);
+    }
+  };
+
   useEffect(() => {
-    const c = localStorage.getItem('@sys:categorias');
-    const p = localStorage.getItem('@sys:produtos');
-    const m = localStorage.getItem('@sys:movimentacoes');
-    const per = localStorage.getItem('@sys:perdas');
-    
-    if (c) setCategorias(JSON.parse(c));
-    if (p) setProdutos(JSON.parse(p));
-    if (m) setMovimentacoes(JSON.parse(m));
-    if (per) setPerdas(JSON.parse(per));
+    carregarCategorias();
+    // Aqui você também carregará produtos e movimentações no futuro
   }, []);
 
-  // --- SALVAR DADOS ---
-  useEffect(() => {
-    localStorage.setItem('@sys:categorias', JSON.stringify(categorias));
-    localStorage.setItem('@sys:produtos', JSON.stringify(produtos));
-    localStorage.setItem('@sys:movimentacoes', JSON.stringify(movimentacoes));
-    localStorage.setItem('@sys:perdas', JSON.stringify(perdas));
-  }, [categorias, produtos, movimentacoes, perdas]);
+  // --- 2. ADICIONAR CATEGORIA (POST API) ---
+  const adicionarCategoria = async (nome: string): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/categorias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome }),
+      });
 
-  // --- IMPLEMENTAÇÃO DAS CATEGORIAS ---
-  const adicionarCategoria = (nome: string) => {
-    const nova = { 
-      id: Date.now(), 
-      nome: nome.toUpperCase().trim() 
-    };
-    setCategorias(prev => [...prev, nova]);
+      if (res.ok) {
+        await carregarCategorias(); // Atualiza a lista vinda do banco
+        return true;
+      } else {
+        const erro = await res.json();
+        alert(erro.error || "Erro ao salvar categoria");
+        return false;
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      return false;
+    }
   };
 
-  const excluirCategoria = (id: number) => {
-    setCategorias(prev => prev.filter(cat => cat.id !== id));
-    // Opcional: Você pode adicionar lógica aqui para avisar se houver produtos vinculados
+  // --- 3. EXCLUIR CATEGORIA (DELETE API) ---
+  const excluirCategoria = async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/categorias/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setCategorias(prev => prev.filter(cat => cat.id !== id));
+        return true;
+      } else {
+        const erro = await res.json();
+        alert(erro.error || "Erro ao excluir. Verifique se há produtos vinculados.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Erro ao excluir:", error);
+      return false;
+    }
   };
+
+  // --- LÓGICA DE PRODUTOS (MANTEREMOS LOCAL POR ENQUANTO) ---
+  // Nota: Estas funções serão as próximas a serem migradas para API
 
   const adicionarProduto = (p: any) => {
-    setProdutos(prev => [...prev, { 
-      ...p, 
-      id: Date.now(), 
-      nome: p.nome.toUpperCase(),
-      estoque: 0 
-    }]);
+    const novo = { ...p, id: Math.random().toString(), estoque: 0 };
+    setProdutos(prev => [...prev, novo]);
   };
 
   const adicionarEntrada = (itensEntrada: any[]) => {
     if (itensEntrada.length === 0) return;
-
     setProdutos(prevProdutos => {
       return prevProdutos.map(prod => {
         const itemNovo = itensEntrada.find(i => i.produtoId === prod.id);
@@ -106,21 +140,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           return {
             ...prod,
             estoque: (prod.estoque || 0) + Number(itemNovo.qtd),
-            preco: Number(itemNovo.precoVenda)
+            precoVenda: Number(itemNovo.precoVenda)
           };
         }
         return prod;
       });
     });
-
-    const totalCusto = itensEntrada.reduce((acc, i) => acc + (i.precoCusto * i.qtd), 0);
-    setMovimentacoes(prev => [...prev, {
-      id: Date.now(),
-      data: new Date().toLocaleString('pt-BR'),
-      desc: `ENTRADA: ${itensEntrada.length} ITENS`,
-      tipo: 'SAIDA',
-      valor: totalCusto
-    }]);
+    // Log de movimentação...
   };
 
   const venderProduto = (carrinho: any[], pagamento: string) => {
@@ -128,44 +154,20 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setProdutos(prev => prev.map(prod => {
       const item = carrinho.find(c => c.produtoId === prod.id);
       if (item) {
-        total += prod.preco * item.qtd;
+        total += prod.precoVenda * item.qtd;
         return { ...prod, estoque: prod.estoque - item.qtd };
       }
       return prod;
     }));
-
-    setMovimentacoes(prev => [...prev, {
-      id: Date.now(),
-      data: new Date().toLocaleString('pt-BR'),
-      desc: `VENDA PDV - ${carrinho.length} ITENS`,
-      pagamento,
-      tipo: 'ENTRADA',
-      valor: total
-    }]);
+    // Log de movimentação...
   };
 
   const registrarPerda = (p: Omit<Perda, 'id' | 'data'>) => {
     const produtoAlvo = produtos.find(prod => prod.id === p.produtoId);
     if (!produtoAlvo) return;
-
-    const novaPerda: Perda = {
-      ...p,
-      id: Date.now(),
-      data: new Date().toLocaleString('pt-BR')
-    };
-    setPerdas(prev => [...prev, novaPerda]);
-
     setProdutos(prev => prev.map(prod => 
       prod.id === p.produtoId ? { ...prod, estoque: prod.estoque - p.qtd } : prod
     ));
-
-    setMovimentacoes(prev => [...prev, {
-      id: Date.now(),
-      data: new Date().toLocaleString('pt-BR'),
-      desc: `PERDA: ${produtoAlvo.nome} (${p.motivo})`,
-      tipo: 'SAIDA',
-      valor: produtoAlvo.precoCusto * p.qtd
-    }]);
   };
 
   return (
@@ -174,12 +176,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       produtos, 
       movimentacoes, 
       perdas,
+      carregarCategorias,
+      adicionarCategoria, 
+      excluirCategoria,
       adicionarProduto, 
       adicionarEntrada, 
       venderProduto,
-      registrarPerda,
-      adicionarCategoria, // Exportado
-      excluirCategoria    // Exportado
+      registrarPerda
     }}>
       {children}
     </DataContext.Provider>

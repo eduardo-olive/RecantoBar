@@ -3,26 +3,44 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // Vamos começar com SQLite por ser mais fácil (gera um arquivo local)
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Categoria {
+  id        String    @id @default(cuid())
+  nome      String    @unique
+  produtos  Produto[]
 }
 
 model Produto {
-  id             String   @id @default(cuid())
-  nome           String   @unique
-  categoria      String
-  estoque        Int      @default(0)
-  estoqueMinimo  Int      @default(5)
-  estoqueSeguro  Int      @default(20)
-  precoCusto     Float    @default(0)
-  precoVenda     Float    @default(0)
-  createdAt      DateTime @default(now())
+  id            String   @id @default(cuid())
+  nome          String
+  precoVenda    Float
+  precoCusto    Float
+  estoque       Int
+  estoqueMinimo Int
+  estoqueSeguro Int
+  categoriaId   String
+  categoria     Categoria @relation(fields: [categoriaId], references: [id])
+  perdas        Perda[]
+  createdAt     DateTime @default(now())
 }
 
 model Movimentacao {
-  id          String   @id @default(cuid())
-  tipo        String   // ENTRADA ou SAIDA
-  desc        String
-  valor       Float
-  pagamento   String?  // PIX, CARTÃO, DINHEIRO
-  data        DateTime @default(now())
+  id        String   @id @default(cuid())
+  data      DateTime @default(now())
+  desc      String
+  pagamento String?  // O "?" indica que é opcional, como no seu interface
+  tipo      String   // Armazenará 'ENTRADA' ou 'SAIDA'
+  valor     Float
+}
+
+model Perda {
+  id        String   @id @default(cuid())
+  data      DateTime @default(now())
+  produtoId String
+  produto   Produto  @relation(fields: [produtoId], references: [id])
+  qtd       Int
+  motivo    String
 }

@@ -1,18 +1,60 @@
 "use client";
 
-import { useData } from '../DataContext';
 import { Tag, Trash2, FolderPlus, Inbox } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function CategoriasPage() {
-  const { categorias, adicionarCategoria, excluirCategoria } = useData();
+  const [categorias, setCategorias] = useState<any[]>([]);
   const [novaCategoria, setNovaCategoria] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleAdd = (e: React.FormEvent) => {
+  // 1. BUSCAR DADOS DA API (Substitui o que vinha do context)
+  async function carregarCategorias() {
+    try {
+      const res = await fetch('/api/categorias');
+      const data = await res.json();
+      if (Array.isArray(data)) setCategorias(data);
+    } catch (err) {
+      console.error("Erro ao carregar:", err);
+    }
+  }
+
+  useEffect(() => { carregarCategorias(); }, []);
+
+  // 2. GRAVAR NA API
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!novaCategoria.trim()) return;
-    adicionarCategoria(novaCategoria);
-    setNovaCategoria("");
+    if (!novaCategoria.trim() || loading) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/categorias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: novaCategoria }),
+      });
+
+      if (response.ok) {
+        setNovaCategoria("");
+        carregarCategorias(); // Recarrega a lista do banco
+      }
+    } catch (err) {
+      alert("Erro ao salvar categoria no banco.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 3. EXCLUIR NA API (Opcional, se você quiser já deixar pronto)
+  const handleExcluir = async (id: string, nome: string) => {
+    if (!confirm(`Deseja excluir ${nome}?`)) return;
+
+    try {
+      await fetch(`/api/categorias/${id}`, { method: 'DELETE' });
+      carregarCategorias();
+    } catch (err) {
+      alert("Erro ao excluir.");
+    }
   };
 
   return (
@@ -29,11 +71,16 @@ export default function CategoriasPage() {
             type="text" 
             value={novaCategoria}
             onChange={(e) => setNovaCategoria(e.target.value)}
-            placeholder="DIGITE A NOVA CATEGORIA..." 
-            className="flex-1 bg-slate-50 dark:bg-slate-950 border-none p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white focus:ring-2 ring-indigo-500/20 transition-all"
+            placeholder={loading ? "GRAVANDO..." : "DIGITE A NOVA CATEGORIA..."} 
+            disabled={loading}
+            className="flex-1 bg-slate-50 dark:bg-slate-950 border-none p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white focus:ring-2 ring-indigo-500/20 transition-all disabled:opacity-50"
           />
-          <button type="submit" className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-500 transition-all flex items-center gap-2">
-            <FolderPlus size={18} /> Adicionar
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-500 transition-all flex items-center gap-2 disabled:bg-slate-500"
+          >
+            <FolderPlus size={18} /> {loading ? "Aguarde..." : "Adicionar"}
           </button>
         </form>
       </section>
@@ -53,7 +100,7 @@ export default function CategoriasPage() {
                 <h3 className="font-black text-slate-800 dark:text-white uppercase italic">{cat.nome}</h3>
               </div>
               <button 
-                onClick={() => confirm(`Deseja excluir ${cat.nome}?`) && excluirCategoria(cat.id)}
+                onClick={() => handleExcluir(cat.id, cat.nome)}
                 className="text-slate-300 hover:text-rose-500 transition-colors p-2"
               >
                 <Trash2 size={16} />
@@ -64,4 +111,4 @@ export default function CategoriasPage() {
       </div>
     </div>
   );
-} 
+}
