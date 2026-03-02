@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")   // Porta 6543 (Vercel usa esta)
+  directUrl = env("DIRECT_URL")     // Porta 5432 (Você usa esta no seu PC para migrate)
 }
 
 model Categoria {
