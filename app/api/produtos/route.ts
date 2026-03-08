@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const produtos = await prisma.produto.findMany({
+      orderBy: {
+        nome: 'asc', // 'asc' para A-Z ou 'desc' para Z-A
+      },
       include: { categoria: true } // Traz o nome da categoria junto
     });
     return NextResponse.json(produtos);

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Tag, Box, AlertTriangle, Inbox, TrendingUp } from 'lucide-react'; 
+import { Plus, Tag, Box, AlertTriangle, Inbox, TrendingUp, Trash2, Pencil, X } from 'lucide-react'; 
 import { useState, useEffect } from 'react';
 
 export default function ProdutosPage() {
@@ -8,6 +8,9 @@ export default function ProdutosPage() {
   const [categorias, setCategorias] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   
+  // ESTADO PARA CONTROLE DE EDIÇÃO
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+
   const [novoProduto, setNovoProduto] = useState({
     nome: "",
     estoqueMinimo: "",
@@ -15,7 +18,6 @@ export default function ProdutosPage() {
     categoriaId: "" 
   });
 
-  // 1. CARREGAR DADOS DO BANCO
   async function carregarDados() {
     try {
       const [resP, resC] = await Promise.all([
@@ -33,33 +35,75 @@ export default function ProdutosPage() {
 
   useEffect(() => { carregarDados(); }, []);
 
-  // 2. GRAVAR NO BANCO
-  const handleAdd = async (e: React.FormEvent) => {
+  // FUNÇÃO PARA PREPARAR A EDIÇÃO
+  const handlePrepareEdit = (prod: any) => {
+    setEditandoId(prod.id);
+    setNovoProduto({
+      nome: prod.nome,
+      estoqueMinimo: prod.estoqueMinimo.toString(),
+      estoqueSeguro: prod.estoqueSeguro.toString(),
+      categoriaId: prod.categoriaId
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // FUNÇÃO PARA CANCELAR EDIÇÃO
+  const handleCancelEdit = () => {
+    setEditandoId(null);
+    setNovoProduto({ nome: "", estoqueMinimo: "", estoqueSeguro: "", categoriaId: "" });
+  };
+
+  const handleDelete = async (id: string, nome: string) => {
+    if (!confirm(`DESEJA REALMENTE EXCLUIR O PRODUTO: ${nome}?`)) return;
+
+    try {
+      const response = await fetch(`/api/produtos/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        carregarDados();
+      } else {
+        alert("Erro ao excluir produto.");
+      }
+    } catch (err) {
+      console.error("Erro ao deletar:", err);
+      alert("Erro na comunicação com o servidor.");
+    }
+  };
+
+  // SUBMIT HÍBRIDO (ADD OU EDIT)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novoProduto.nome || !novoProduto.categoriaId || loading) return;
 
     setLoading(true);
     try {
-      const response = await fetch('/api/produtos', {
-        method: 'POST',
+      const url = editandoId ? `/api/produtos/${editandoId}` : '/api/produtos';
+      const method = editandoId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nome: novoProduto.nome.toUpperCase(),
           categoriaId: novoProduto.categoriaId,
           estoqueMinimo: Number(novoProduto.estoqueMinimo) || 0,
           estoqueSeguro: Number(novoProduto.estoqueSeguro) || 0,
-          estoque: 0,       // Inicializa estoque zerado no banco
-          precoVenda: 0,    // Valores padrão conforme seu schema
-          precoCusto: 0
+          // Mantém valores padrão apenas se for criação nova
+          ...(editandoId ? {} : { estoque: 0, precoVenda: 0, precoCusto: 0 })
         }),
       });
 
       if (response.ok) {
-        setNovoProduto({ nome: "", estoqueMinimo: "", estoqueSeguro: "", categoriaId: "" });
-        carregarDados(); // Atualiza a lista
+        handleCancelEdit(); // Limpa form e estado de edição
+        carregarDados();
+      } else {
+        const erro = await response.json();
+        alert(erro.error || "Erro na operação.");
       }
     } catch (err) {
-      alert("Erro ao registrar produto no banco.");
+      alert("Erro ao processar produto.");
     } finally {
       setLoading(false);
     }
@@ -68,17 +112,19 @@ export default function ProdutosPage() {
   return (
     <div className="space-y-8 pb-10">
       <header className="border-l-4 border-emerald-500 pl-6 py-2">
-        <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Produtos</h1>
+        <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
+          {editandoId ? "Editar Produto" : "Produtos"}
+        </h1>
         <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Definição de Itens e Metas de Inventário</p>
       </header>
 
       {/* FORMULÁRIO */}
-      <section className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
-        <form onSubmit={handleAdd} className="space-y-4">
+      <section className={`transition-all duration-300 p-8 rounded-[32px] border ${editandoId ? 'bg-blue-50/50 border-blue-200' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <input 
               type="text" 
-              placeholder="NOME DO PRODUTO (EX: CERVEJA LATA 350ML)" 
+              placeholder="NOME DO PRODUTO" 
               value={novoProduto.nome}
               onChange={(e) => setNovoProduto({...novoProduto, nome: e.target.value})}
               className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white border border-transparent focus:border-emerald-500 transition-all"
@@ -107,7 +153,6 @@ export default function ProdutosPage() {
                 onChange={(e) => setNovoProduto({...novoProduto, estoqueMinimo: e.target.value})}
                 className="w-full bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white"
               />
-              <AlertTriangle className="absolute right-4 top-4 text-amber-500 opacity-20" size={18} />
             </div>
 
             <div className="relative">
@@ -118,16 +163,28 @@ export default function ProdutosPage() {
                 onChange={(e) => setNovoProduto({...novoProduto, estoqueSeguro: e.target.value})}
                 className="w-full bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white"
               />
-              <TrendingUp className="absolute right-4 top-4 text-emerald-500 opacity-20" size={18} />
             </div>
 
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="bg-emerald-600 text-white p-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
-            >
-              <Plus size={18} /> {loading ? "Registrando..." : "Registrar Item"}
-            </button>
+            <div className="flex gap-2">
+              <button 
+                type="submit" 
+                disabled={loading}
+                className={`flex-1 ${editandoId ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500'} text-white p-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50`}
+              >
+                {editandoId ? <Pencil size={18} /> : <Plus size={18} />} 
+                {loading ? "Gravando..." : editandoId ? "Salvar Alterações" : "Registrar Item"}
+              </button>
+
+              {editandoId && (
+                <button 
+                  type="button" 
+                  onClick={handleCancelEdit}
+                  className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 p-4 rounded-2xl hover:bg-slate-300 transition-all"
+                >
+                  <X size={20} />
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </section>
@@ -141,25 +198,19 @@ export default function ProdutosPage() {
               <th className="p-6">Categoria</th>
               <th className="p-6">Meta de Estoque (Min/Máx)</th>
               <th className="p-6 text-right">Saldo em Tempo Real</th>
+              <th className="p-6 text-center">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {produtos.length === 0 ? (
-               <tr>
-                 <td colSpan={4} className="py-20 text-center">
-                    <div className="flex flex-col items-center justify-center text-slate-400">
-                      <Inbox size={48} className="mb-4 opacity-20" />
-                      <p className="font-bold uppercase tracking-widest text-xs">Nenhum produto no banco</p>
-                    </div>
-                 </td>
-               </tr>
+               <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-bold uppercase text-xs">Nenhum produto no banco</td></tr>
             ) : (
               produtos.map((prod) => {
                 const saldo = prod.estoque || 0;
                 const isCritico = saldo <= prod.estoqueMinimo;
 
                 return (
-                  <tr key={prod.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                  <tr key={prod.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
                     <td className="p-6">
                       <p className="font-black text-slate-800 dark:text-white uppercase text-sm italic">{prod.nome}</p>
                     </td>
@@ -177,8 +228,23 @@ export default function ProdutosPage() {
                     </td>
                     <td className="p-6 text-right">
                       <div className={`inline-flex items-center gap-2 font-black italic text-lg ${isCritico ? 'text-rose-500' : 'text-emerald-500'}`}>
-                        {isCritico && <AlertTriangle size={14} className="animate-pulse" />}
                         {saldo} <span className="text-[10px] uppercase not-italic ml-1">UN</span>
+                      </div>
+                    </td>
+                    <td className="p-6 text-center">
+                      <div className="flex justify-center gap-2">
+                        <button 
+                          onClick={() => handlePrepareEdit(prod)}
+                          className="text-slate-300 hover:text-blue-500 transition-colors p-2 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/10"
+                        >
+                          <Pencil size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(prod.id, prod.nome)}
+                          className="text-slate-300 hover:text-rose-500 transition-colors p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
                     </td>
                   </tr>
