@@ -1,12 +1,24 @@
 "use client";
 
-import { Plus, Tag, Box, AlertTriangle, Inbox, TrendingUp, Trash2, Pencil, X } from 'lucide-react'; 
+import { 
+  Plus, 
+  Tag, 
+  Box, 
+  AlertTriangle, 
+  Inbox, 
+  TrendingUp, 
+  Trash2, 
+  Pencil, 
+  X, 
+  Search 
+} from 'lucide-react'; 
 import { useState, useEffect } from 'react';
 
 export default function ProdutosPage() {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [categorias, setCategorias] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [busca, setBusca] = useState("");
   
   // ESTADO PARA CONTROLE DE EDIÇÃO
   const [editandoId, setEditandoId] = useState<string | null>(null);
@@ -18,6 +30,7 @@ export default function ProdutosPage() {
     categoriaId: "" 
   });
 
+  // CARREGAR DADOS COM ORDENAÇÃO ALFABÉTICA
   async function carregarDados() {
     try {
       const [resP, resC] = await Promise.all([
@@ -26,8 +39,16 @@ export default function ProdutosPage() {
       ]);
       const dataP = await resP.json();
       const dataC = await resC.json();
-      if (Array.isArray(dataP)) setProdutos(dataP);
-      if (Array.isArray(dataC)) setCategorias(dataC);
+
+      if (Array.isArray(dataP)) {
+        // Ordena A-Z por nome
+        const ordenados = dataP.sort((a, b) => a.nome.localeCompare(b.nome));
+        setProdutos(ordenados);
+      }
+      if (Array.isArray(dataC)) {
+        const catsOrdenadas = dataC.sort((a, b) => a.nome.localeCompare(b.nome));
+        setCategorias(catsOrdenadas);
+      }
     } catch (err) {
       console.error("Erro ao sincronizar dados:", err);
     }
@@ -35,7 +56,12 @@ export default function ProdutosPage() {
 
   useEffect(() => { carregarDados(); }, []);
 
-  // FUNÇÃO PARA PREPARAR A EDIÇÃO
+  // LÓGICA DE PESQUISA EM TEMPO REAL
+  const produtosFiltrados = produtos.filter(prod => 
+    prod.nome.toLowerCase().includes(busca.toLowerCase())
+  );
+
+  // PREPARAR EDIÇÃO (CARREGA NO FORM E SOBE A TELA)
   const handlePrepareEdit = (prod: any) => {
     setEditandoId(prod.id);
     setNovoProduto({
@@ -47,7 +73,6 @@ export default function ProdutosPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // FUNÇÃO PARA CANCELAR EDIÇÃO
   const handleCancelEdit = () => {
     setEditandoId(null);
     setNovoProduto({ nome: "", estoqueMinimo: "", estoqueSeguro: "", categoriaId: "" });
@@ -55,24 +80,15 @@ export default function ProdutosPage() {
 
   const handleDelete = async (id: string, nome: string) => {
     if (!confirm(`DESEJA REALMENTE EXCLUIR O PRODUTO: ${nome}?`)) return;
-
     try {
-      const response = await fetch(`/api/produtos/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        carregarDados();
-      } else {
-        alert("Erro ao excluir produto.");
-      }
+      const response = await fetch(`/api/produtos/${id}`, { method: 'DELETE' });
+      if (response.ok) carregarDados();
+      else alert("Erro ao excluir produto.");
     } catch (err) {
-      console.error("Erro ao deletar:", err);
       alert("Erro na comunicação com o servidor.");
     }
   };
 
-  // SUBMIT HÍBRIDO (ADD OU EDIT)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novoProduto.nome || !novoProduto.categoriaId || loading) return;
@@ -90,13 +106,12 @@ export default function ProdutosPage() {
           categoriaId: novoProduto.categoriaId,
           estoqueMinimo: Number(novoProduto.estoqueMinimo) || 0,
           estoqueSeguro: Number(novoProduto.estoqueSeguro) || 0,
-          // Mantém valores padrão apenas se for criação nova
           ...(editandoId ? {} : { estoque: 0, precoVenda: 0, precoCusto: 0 })
         }),
       });
 
       if (response.ok) {
-        handleCancelEdit(); // Limpa form e estado de edição
+        handleCancelEdit();
         carregarDados();
       } else {
         const erro = await response.json();
@@ -115,11 +130,11 @@ export default function ProdutosPage() {
         <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
           {editandoId ? "Editar Produto" : "Produtos"}
         </h1>
-        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Definição de Itens e Metas de Inventário</p>
+        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Gestão de Inventário e Metas</p>
       </header>
 
-      {/* FORMULÁRIO */}
-      <section className={`transition-all duration-300 p-8 rounded-[32px] border ${editandoId ? 'bg-blue-50/50 border-blue-200' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`}>
+      {/* FORMULÁRIO DE CADASTRO/EDIÇÃO */}
+      <section className={`transition-all duration-300 p-8 rounded-[32px] border ${editandoId ? 'bg-blue-50/50 border-blue-200 shadow-inner' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <input 
@@ -145,25 +160,20 @@ export default function ProdutosPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <input 
-                type="number" 
-                placeholder="LIMITE MÍNIMO" 
-                value={novoProduto.estoqueMinimo}
-                onChange={(e) => setNovoProduto({...novoProduto, estoqueMinimo: e.target.value})}
-                className="w-full bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white"
-              />
-            </div>
-
-            <div className="relative">
-              <input 
-                type="number" 
-                placeholder="CAPACIDADE MÁXIMA" 
-                value={novoProduto.estoqueSeguro}
-                onChange={(e) => setNovoProduto({...novoProduto, estoqueSeguro: e.target.value})}
-                className="w-full bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white"
-              />
-            </div>
+            <input 
+              type="number" 
+              placeholder="LIMITE MÍNIMO" 
+              value={novoProduto.estoqueMinimo}
+              onChange={(e) => setNovoProduto({...novoProduto, estoqueMinimo: e.target.value})}
+              className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white"
+            />
+            <input 
+              type="number" 
+              placeholder="CAPACIDADE MÁXIMA" 
+              value={novoProduto.estoqueSeguro}
+              onChange={(e) => setNovoProduto({...novoProduto, estoqueSeguro: e.target.value})}
+              className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white"
+            />
 
             <div className="flex gap-2">
               <button 
@@ -172,7 +182,7 @@ export default function ProdutosPage() {
                 className={`flex-1 ${editandoId ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500'} text-white p-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50`}
               >
                 {editandoId ? <Pencil size={18} /> : <Plus size={18} />} 
-                {loading ? "Gravando..." : editandoId ? "Salvar Alterações" : "Registrar Item"}
+                {loading ? "PROCESSANDO..." : editandoId ? "SALVAR ALTERAÇÕES" : "REGISTRAR ITEM"}
               </button>
 
               {editandoId && (
@@ -189,23 +199,42 @@ export default function ProdutosPage() {
         </form>
       </section>
 
-      {/* LISTAGEM */}
+      {/* BARRA DE PESQUISA */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+          <Search className="text-slate-400" size={18} />
+        </div>
+        <input
+          type="text"
+          placeholder="PESQUISAR PRODUTO NA LISTA..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          className="w-full bg-white dark:bg-slate-900 p-4 pl-12 rounded-2xl text-[10px] font-black uppercase outline-none border border-slate-200 dark:border-slate-800 focus:border-emerald-500 transition-all shadow-sm dark:text-white"
+        />
+      </div>
+
+      {/* LISTAGEM EM TABELA */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
         <table className="w-full text-left">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-950 text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
               <th className="p-6">Produto / Identificação</th>
               <th className="p-6">Categoria</th>
-              <th className="p-6">Meta de Estoque (Min/Máx)</th>
-              <th className="p-6 text-right">Saldo em Tempo Real</th>
-              <th className="p-6 text-center">Ações</th>
+              <th className="p-6">Metas (Min/Máx)</th>
+              <th className="p-6 text-right">Saldo Atual</th>
+              <th className="p-6 text-center">Gerenciar</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-            {produtos.length === 0 ? (
-               <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-bold uppercase text-xs">Nenhum produto no banco</td></tr>
+            {produtosFiltrados.length === 0 ? (
+               <tr>
+                 <td colSpan={5} className="py-20 text-center text-slate-400 font-bold uppercase text-xs">
+                    <Inbox size={48} className="mx-auto mb-4 opacity-20" />
+                    Nenhum produto encontrado
+                 </td>
+               </tr>
             ) : (
-              produtos.map((prod) => {
+              produtosFiltrados.map((prod) => {
                 const saldo = prod.estoque || 0;
                 const isCritico = saldo <= prod.estoqueMinimo;
 
@@ -216,7 +245,7 @@ export default function ProdutosPage() {
                     </td>
                     <td className="p-6">
                       <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-[10px] font-black text-slate-500 uppercase">
-                        {prod.categoria?.nome || "NÃO DEFINIDO"}
+                        {prod.categoria?.nome || "GERAL"}
                       </span>
                     </td>
                     <td className="p-6">
@@ -228,6 +257,7 @@ export default function ProdutosPage() {
                     </td>
                     <td className="p-6 text-right">
                       <div className={`inline-flex items-center gap-2 font-black italic text-lg ${isCritico ? 'text-rose-500' : 'text-emerald-500'}`}>
+                        {isCritico && <AlertTriangle size={14} className="animate-pulse" />}
                         {saldo} <span className="text-[10px] uppercase not-italic ml-1">UN</span>
                       </div>
                     </td>
@@ -236,12 +266,14 @@ export default function ProdutosPage() {
                         <button 
                           onClick={() => handlePrepareEdit(prod)}
                           className="text-slate-300 hover:text-blue-500 transition-colors p-2 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/10"
+                          title="Editar"
                         >
                           <Pencil size={18} />
                         </button>
                         <button 
                           onClick={() => handleDelete(prod.id, prod.nome)}
                           className="text-slate-300 hover:text-rose-500 transition-colors p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                          title="Excluir"
                         >
                           <Trash2 size={18} />
                         </button>
