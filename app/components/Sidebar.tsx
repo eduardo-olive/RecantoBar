@@ -61,7 +61,7 @@ export function Sidebar() {
     <aside className="w-72 h-screen sticky top-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 transition-colors">
       <div className="mb-10 px-2">
         <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">
-          Premium<span className="text-blue-600">POS</span>
+          Recanto<span className="text-blue-600">PRO</span>
         </h2>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Gestão Inteligente</p>
       </div>
