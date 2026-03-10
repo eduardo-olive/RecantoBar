@@ -60,7 +60,7 @@ export function Sidebar() {
     }
   ];
 
-  const toggleGroup = (id) => {
+  const toggleGroup = (id: string) => {
     setOpenGroup(openGroup === id ? "" : id);
   };
 
