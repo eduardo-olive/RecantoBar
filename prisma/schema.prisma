@@ -52,5 +52,4 @@ model Caixa {
   data_abertura  DateTime @default(now())
   status         String   @default("aberto") // para fechar o caixa depois
 
-  @@map("caixas")
 }

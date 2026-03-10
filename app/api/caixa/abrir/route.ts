@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const { valor } = await request.json();
 
-    const novoCaixa = await prisma.caixas.create({
+    const novoCaixa = await prisma.caixa.create({
       data: {
         valor_inicial: valor,
         valor_atual: valor, // No início, o atual é igual ao inicial
