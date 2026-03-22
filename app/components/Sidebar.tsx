@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, ShoppingCart, Package, Tags, 
+import {
+  LayoutDashboard, ShoppingCart, Package, Tags,
   AlertTriangle, FileText, Truck, Moon, Sun,
-  ClipboardList, ChevronDown, Banknote, Coins, Wallet
+  ClipboardList, ChevronDown, Banknote, Coins, Wallet,
+  Receipt, BarChart3, CreditCard, TrendingUp
 } from "lucide-react";
 
 export function Sidebar() {
@@ -53,9 +54,13 @@ export function Sidebar() {
       icon: Wallet,
       items: [
         { name: "Caixa / Fluxo", path: "/caixa", icon: Banknote },
-        { name: "Saldo Inicial", path: "/caixa/saldo-inicial", icon: Coins },
+        { name: "Abrir Caixa", path: "/caixa/saldo-inicial", icon: Coins },
+        { name: "Despesas", path: "/despesas", icon: Receipt },
+        { name: "Contas Pagar/Receber", path: "/contas", icon: CreditCard },
         { name: "Relatórios", path: "/dashboard/relatorios", icon: FileText },
-        { name: 'Sugestão de Compra', path: '/dashboard/relatorios/compras', icon: ClipboardList },
+        { name: "DRE", path: "/dashboard/relatorios/dre", icon: TrendingUp },
+        { name: "Margem Produtos", path: "/dashboard/relatorios/margem", icon: BarChart3 },
+        { name: "Sugestão de Compra", path: "/dashboard/relatorios/compras", icon: ClipboardList },
       ]
     }
   ];
@@ -104,7 +109,7 @@ export function Sidebar() {
 
             {/* ITENS DO GRUPO (HIDDEN/VISIBLE) */}
             <div className={`overflow-hidden transition-all duration-300 space-y-1 ${
-              openGroup === group.id ? "max-h-64 opacity-100 mt-1" : "max-h-0 opacity-0"
+              openGroup === group.id ? "max-h-[500px] opacity-100 mt-1" : "max-h-0 opacity-0"
             }`}>
               {group.items.map((item) => {
                 const isActive = pathname === item.path;
