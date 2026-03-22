@@ -33,6 +33,10 @@ export default function Dashboard() {
 
   useEffect(() => { carregarDados(); }, []);
 
+  const vendas = movimentacoes.filter((m: any) => m.categoria === 'VENDA' || (m.tipo === 'SAIDA' && !m.categoria));
+  const totalVendas = stats?.totalVendas || vendas.reduce((acc: number, m: any) => acc + m.valor, 0);
+  const ticketMedio = vendas.length > 0 ? totalVendas / vendas.length : 0;
+
   const alertasEstoque = produtos
     .filter(p => p.estoque < p.estoqueMinimo)
     .sort((a, b) => (a.estoque - a.estoqueMinimo) - (b.estoque - b.estoqueMinimo))

@@ -1,6 +1,7 @@
 import './globals.css';
 import { DataProvider } from './DataContext';
-import { Sidebar } from './components/Sidebar';
+import { AuthProvider } from './components/AuthProvider';
+import { AppShell } from './components/AppShell';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,23 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-        <DataProvider>
-          <div className="flex min-h-screen">
-            
-            {/* SIDEBAR */}
-            <div className="w-72 h-screen fixed left-0 top-0 z-40">
-              <Sidebar />
-            </div>
-
-            {/* CONTEÚDO: O ml-72 empurra o conteúdo para depois da sidebar */}
-            <main className="flex-1 ml-72 min-h-screen">
-              {/* Padding interno para o conteúdo não encostar nas bordas da tela */}
-              <div className="p-8 lg:p-12 max-w-[1600px] mx-auto">
-                {children}
-              </div>
-            </main>
-          </div>
-        </DataProvider>
+        <AuthProvider>
+          <DataProvider>
+            <AppShell>
+              {children}
+            </AppShell>
+          </DataProvider>
+        </AuthProvider>
       </body>
     </html>
   );
