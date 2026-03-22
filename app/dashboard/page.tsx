@@ -58,7 +58,10 @@ export default function Dashboard() {
 
   const ticketMedio = vendas.length > 0 ? totalFaturamento / vendas.length : 0;
 
-  const alertasEstoque = produtos.filter(p => p.estoque < p.estoqueMinimo);
+  const alertasEstoque = produtos
+    .filter(p => p.estoque < p.estoqueMinimo)
+    .sort((a, b) => (a.estoque - a.estoqueMinimo) - (b.estoque - b.estoqueMinimo))
+    .slice(0, 5);
 
   if (loading) {
     return (
