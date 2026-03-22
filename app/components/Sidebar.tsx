@@ -12,16 +12,20 @@ import {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
-  
+
   // Estado para controlar qual grupo está aberto (ex: 'estoque')
   const [openGroup, setOpenGroup] = useState("operacional");
 
   useEffect(() => {
     setMounted(true);
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
+    // Dark mode é o padrão, só desativa se o usuário escolheu light
+    if (savedTheme === "light") {
+      setIsDark(false);
+      document.documentElement.classList.remove("dark");
+    } else {
       setIsDark(true);
       document.documentElement.classList.add("dark");
     }
@@ -77,7 +81,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-72 h-screen sticky top-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 transition-all">
+    <aside className="w-72 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 transition-all overflow-hidden">
       <div className="mb-10 px-2 text-center">
         <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
           Recanto <span className="text-blue-600">PLANALTO</span>
