@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -23,6 +21,7 @@
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
@@ -30,8 +29,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (contem DATABASE_URL do Supabase - NUNCA subir)
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -40,4 +41,18 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# prisma - cliente gerado
 /app/generated/prisma
+
+# prisma - banco SQLite local (producao usa Supabase)
+prisma/*.db
+prisma/prisma/*.db
+
+# prisma - migrations com drift (usamos db push direto no Supabase)
+prisma/migrations/
+
+# editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo

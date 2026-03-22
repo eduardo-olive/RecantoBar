@@ -1,35 +1,41 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-interface ItemVenda {
-  produtoId: string;
-  quantidade: number;
-  precoUnitario: number;
-}
+import { getCaixaAberto } from "@/lib/caixa";
 
 export async function POST(request: Request) {
   try {
     const { itens, metodoPagamento } = await request.json();
+    const caixa = await getCaixaAberto();
 
     await prisma.$transaction(async (tx) => {
+      let totalVenda = 0;
+
       for (const item of itens) {
-        // 1. REGISTRO FINANCEIRO
-        // Usamos seu schema: desc, pagamento, tipo, valor
+        const valor = Number(item.total);
+        totalVenda += valor;
+
         await tx.movimentacao.create({
           data: {
-            tipo: "SAIDA", // Registro de saída de mercadoria (entrada de caixa)
-            valor: Number(item.total),
+            tipo: "SAIDA",
+            categoria: "VENDA",
+            valor: valor,
             desc: `VENDA PDV: ${item.qtd}x ${item.nome}`,
             pagamento: metodoPagamento,
-          }
+            caixaId: caixa?.id || null,
+          },
         });
 
-        // 2. ATUALIZA O ESTOQUE DO PRODUTO
         await tx.produto.update({
           where: { id: item.produtoId },
-          data: {
-            estoque: { decrement: Number(item.qtd) }
-          }
+          data: { estoque: { decrement: Number(item.qtd) } },
+        });
+      }
+
+      // Atualiza saldo do caixa
+      if (caixa) {
+        await tx.caixa.update({
+          where: { id: caixa.id },
+          data: { valor_atual: { increment: totalVenda } },
         });
       }
     });

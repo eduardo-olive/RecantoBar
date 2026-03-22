@@ -1,45 +1,45 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-interface ItemEstoque {
-  produtoId: string;
-  qtd: number;
-  precoCusto: number;
-  precoVenda: number;
-}
+import { getCaixaAberto } from "@/lib/caixa";
 
 export async function POST(request: Request) {
   try {
     const carrinho = await request.json();
+    const caixa = await getCaixaAberto();
 
-    // Iniciamos a transação para garantir que o estoque e o financeiro fiquem sincronizados
     await prisma.$transaction(async (tx) => {
+      let totalCompra = 0;
+
       for (const item of carrinho) {
-        
-        // 1. REGISTRO NA TABELA MOVIMENTACAO
-        // Usamos apenas os campos que existem no seu schema.prisma
+        const valor = Number((item.precoCusto * item.qtd).toFixed(2));
+        totalCompra += valor;
+
         await tx.movimentacao.create({
           data: {
             tipo: "ENTRADA",
-            valor: Number((item.precoCusto * item.qtd).toFixed(2)),
-            // Como não temos 'produtoId' na Movimentacao, guardamos o rastro no 'desc'
+            categoria: "COMPRA",
+            valor: valor,
             desc: `COMPRA: ${item.qtd}x ${item.nome} (Custo un: R$ ${item.precoCusto.toFixed(2)})`,
-            pagamento: "ENTRADA_ESTOQUE", // Identificador para o seu financeiro
-            // O campo 'data' é preenchido automaticamente pelo @default(now())
-          }
+            pagamento: "ENTRADA_ESTOQUE",
+            caixaId: caixa?.id || null,
+          },
         });
 
-        // 2. ATUALIZAÇÃO NA TABELA PRODUTO
-        // Aqui sim usamos o 'produtoId' para localizar e atualizar o estoque e preços
         await tx.produto.update({
           where: { id: item.produtoId },
           data: {
-            estoque: { 
-              increment: Number(item.qtd) 
-            },
+            estoque: { increment: Number(item.qtd) },
             precoCusto: Number(item.precoCusto),
-            precoVenda: Number(item.precoVenda)
-          }
+            precoVenda: Number(item.precoVenda),
+          },
+        });
+      }
+
+      // Atualiza saldo do caixa (compra = dinheiro saindo)
+      if (caixa) {
+        await tx.caixa.update({
+          where: { id: caixa.id },
+          data: { valor_atual: { decrement: totalCompra } },
         });
       }
     });
