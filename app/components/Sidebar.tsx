@@ -3,24 +3,29 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, ShoppingCart, Package, Tags, 
+import {
+  LayoutDashboard, ShoppingCart, Package, Tags,
   AlertTriangle, FileText, Truck, Moon, Sun,
-  ClipboardList, ChevronDown, Banknote, Coins, Wallet
+  ClipboardList, ChevronDown, Banknote, Coins, Wallet,
+  Receipt, BarChart3, CreditCard, TrendingUp
 } from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
-  
+
   // Estado para controlar qual grupo está aberto (ex: 'estoque')
   const [openGroup, setOpenGroup] = useState("operacional");
 
   useEffect(() => {
     setMounted(true);
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
+    // Dark mode é o padrão, só desativa se o usuário escolheu light
+    if (savedTheme === "light") {
+      setIsDark(false);
+      document.documentElement.classList.remove("dark");
+    } else {
       setIsDark(true);
       document.documentElement.classList.add("dark");
     }
@@ -53,9 +58,13 @@ export function Sidebar() {
       icon: Wallet,
       items: [
         { name: "Caixa / Fluxo", path: "/caixa", icon: Banknote },
-        { name: "Saldo Inicial", path: "/caixa/saldo-inicial", icon: Coins },
+        { name: "Abrir Caixa", path: "/caixa/saldo-inicial", icon: Coins },
+        { name: "Despesas", path: "/despesas", icon: Receipt },
+        { name: "Contas Pagar/Receber", path: "/contas", icon: CreditCard },
         { name: "Relatórios", path: "/dashboard/relatorios", icon: FileText },
-        { name: 'Sugestão de Compra', path: '/dashboard/relatorios/compras', icon: ClipboardList },
+        { name: "DRE", path: "/dashboard/relatorios/dre", icon: TrendingUp },
+        { name: "Margem Produtos", path: "/dashboard/relatorios/margem", icon: BarChart3 },
+        { name: "Sugestão de Compra", path: "/dashboard/relatorios/compras", icon: ClipboardList },
       ]
     }
   ];
@@ -72,7 +81,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-72 h-screen sticky top-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 transition-all">
+    <aside className="w-72 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 transition-all overflow-hidden">
       <div className="mb-10 px-2 text-center">
         <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
           Recanto <span className="text-blue-600">PLANALTO</span>
@@ -104,7 +113,7 @@ export function Sidebar() {
 
             {/* ITENS DO GRUPO (HIDDEN/VISIBLE) */}
             <div className={`overflow-hidden transition-all duration-300 space-y-1 ${
-              openGroup === group.id ? "max-h-64 opacity-100 mt-1" : "max-h-0 opacity-0"
+              openGroup === group.id ? "max-h-[500px] opacity-100 mt-1" : "max-h-0 opacity-0"
             }`}>
               {group.items.map((item) => {
                 const isActive = pathname === item.path;

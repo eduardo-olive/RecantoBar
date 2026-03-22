@@ -28,28 +28,54 @@ model Produto {
 }
 
 model Movimentacao {
-  id        String   @id @default(cuid())
-  data      DateTime @default(now())
-  desc      String
-  pagamento String?  // O "?" indica que é opcional, como no seu interface
-  tipo      String   // Armazenará 'ENTRADA' ou 'SAIDA'
-  valor     Float
+  id           String   @id @default(cuid())
+  data         DateTime @default(now())
+  desc         String
+  pagamento    String?
+  tipo         String   // 'ENTRADA' ou 'SAIDA'
+  valor        Float
+  categoria    String   @default("VENDA") // VENDA, COMPRA, DESPESA, PERDA, SANGRIA, SUPRIMENTO
+  subcategoria String?  // Para DESPESA: ALUGUEL, LUZ, AGUA, SALARIOS, etc.
+  caixaId      Int?
+  caixa        Caixa?   @relation(fields: [caixaId], references: [id])
+  perda        Perda?
+  conta        ContaPagarReceber?
 }
 
 model Perda {
-  id        String   @id @default(cuid())
-  data      DateTime @default(now())
-  produtoId String
-  produto   Produto  @relation(fields: [produtoId], references: [id])
-  qtd       Int
-  motivo    String
+  id             String        @id @default(cuid())
+  data           DateTime      @default(now())
+  produtoId      String
+  produto        Produto       @relation(fields: [produtoId], references: [id])
+  qtd            Int
+  motivo         String
+  movimentacaoId String?       @unique
+  movimentacao   Movimentacao? @relation(fields: [movimentacaoId], references: [id])
 }
 
 model Caixa {
-  id             Int      @id @default(autoincrement())
-  valor_inicial  Decimal  @db.Decimal(10, 2)
-  valor_atual    Decimal  @db.Decimal(10, 2)
-  data_abertura  DateTime @default(now())
-  status         String   @default("aberto") // para fechar o caixa depois
+  id              Int            @id @default(autoincrement())
+  valor_inicial   Decimal        @db.Decimal(10, 2)
+  valor_atual     Decimal        @db.Decimal(10, 2)
+  data_abertura   DateTime       @default(now())
+  data_fechamento DateTime?
+  valor_fechamento Decimal?      @db.Decimal(10, 2)
+  diferenca       Decimal?       @db.Decimal(10, 2)
+  observacao      String?
+  status          String         @default("aberto")
+  movimentacoes   Movimentacao[]
+}
 
+model ContaPagarReceber {
+  id             String        @id @default(cuid())
+  tipo           String        // PAGAR ou RECEBER
+  descricao      String
+  valor          Float
+  dataVencimento DateTime
+  dataPagamento  DateTime?
+  status         String        @default("PENDENTE") // PENDENTE, PAGO, CANCELADO
+  categoria      String?       // ALUGUEL, FORNECEDOR, CLIENTE, etc.
+  movimentacaoId String?       @unique
+  movimentacao   Movimentacao? @relation(fields: [movimentacaoId], references: [id])
+  createdAt      DateTime      @default(now())
 }
