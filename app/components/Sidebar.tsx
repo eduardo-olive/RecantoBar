@@ -9,7 +9,7 @@ import {
   AlertTriangle, FileText, Truck, Moon, Sun,
   ClipboardList, ChevronDown, Banknote, Coins, Wallet,
   Receipt, BarChart3, CreditCard, TrendingUp,
-  Users, Settings, LogOut, User
+  Users, Settings, LogOut, User, ClipboardCheck, Grid3X3, UtensilsCrossed
 } from "lucide-react";
 
 export function Sidebar() {
@@ -42,6 +42,8 @@ export function Sidebar() {
       permissao: "vendas",
       items: [
         { name: "Vendas (PDV)", path: "/", icon: ShoppingCart },
+        { name: "Mesas", path: "/mesas", icon: Grid3X3 },
+        { name: "Cozinha", path: "/cozinha", icon: UtensilsCrossed },
         { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
       ]
     },
@@ -54,6 +56,7 @@ export function Sidebar() {
         { name: 'Entrada/Compras', path: '/compras', icon: Truck },
         { name: "Produtos", path: "/produtos", icon: Package },
         { name: "Categorias", path: "/categorias", icon: Tags },
+        { name: "Ajuste Estoque", path: "/ajuste-estoque", icon: ClipboardCheck },
         { name: "Perdas", path: "/perdas", icon: AlertTriangle },
       ]
     },

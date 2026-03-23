@@ -8,11 +8,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { status } = useSession();
 
-  const isLoginPage = pathname === "/login";
-  const isAuthenticated = status === "authenticated";
+  // Pagina de login nunca mostra sidebar
+  if (pathname === "/login") {
+    return <>{children}</>;
+  }
 
-  // Na pagina de login, renderiza so o conteudo
-  if (isLoginPage || !isAuthenticated) {
+  // Enquanto verifica sessao, mostra loading
+  if (status === "loading") {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-black">
+        <div className="font-black uppercase italic animate-pulse text-slate-400 text-sm">Carregando...</div>
+      </div>
+    );
+  }
+
+  // Nao autenticado - mostra so o conteudo (middleware redireciona para login)
+  if (status === "unauthenticated") {
     return <>{children}</>;
   }
 

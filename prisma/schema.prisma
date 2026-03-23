@@ -23,7 +23,9 @@ model Produto {
   estoqueSeguro Int
   categoriaId   String
   categoria     Categoria @relation(fields: [categoriaId], references: [id])
+  requerPreparo Boolean  @default(false)
   perdas        Perda[]
+  pedidoItens   PedidoItem[]
   createdAt     DateTime @default(now())
 }
 
@@ -40,6 +42,8 @@ model Movimentacao {
   caixa        Caixa?   @relation(fields: [caixaId], references: [id])
   perda        Perda?
   conta        ContaPagarReceber?
+  pedido       Pedido?        @relation("PedidoMovimentacao")
+  comandaPgto  ComandaPagamento?
 }
 
 model Perda {
@@ -84,6 +88,73 @@ model Perfil {
   permissoes Json      // ["vendas","caixa","estoque","financeiro","relatorios","admin","usuarios"]
   usuarios   Usuario[]
   createdAt  DateTime  @default(now())
+}
+
+model Mesa {
+  id         Int       @id @default(autoincrement())
+  numero     Int       @unique
+  nome       String?
+  capacidade Int       @default(4)
+  status     String    @default("LIVRE") // LIVRE, OCUPADA
+  ativa      Boolean   @default(true)
+  comandas   Comanda[]
+  pedidos    Pedido[]
+  createdAt  DateTime  @default(now())
+}
+
+model Comanda {
+  id             String             @id @default(cuid())
+  mesaId         Int
+  mesa           Mesa               @relation(fields: [mesaId], references: [id])
+  status         String             @default("ABERTA") // ABERTA, FECHADA, CANCELADA
+  clienteNome    String?
+  observacao     String?
+  pedidos        Pedido[]
+  pagamentos     ComandaPagamento[]
+  dataAbertura   DateTime           @default(now())
+  dataFechamento DateTime?
+}
+
+model Pedido {
+  id              String        @id @default(cuid())
+  mesaId          Int?
+  mesa            Mesa?         @relation(fields: [mesaId], references: [id])
+  comandaId       String?
+  comanda         Comanda?      @relation(fields: [comandaId], references: [id])
+  movimentacaoId  String?       @unique
+  movimentacao    Movimentacao? @relation("PedidoMovimentacao", fields: [movimentacaoId], references: [id])
+  metodoPagamento String?
+  valorTotal      Float
+  pago            Boolean       @default(false)
+  itens           PedidoItem[]
+  criadoEm        DateTime      @default(now())
+}
+
+model PedidoItem {
+  id          String   @id @default(cuid())
+  pedidoId    String
+  pedido      Pedido   @relation(fields: [pedidoId], references: [id])
+  produtoId   String
+  produto     Produto  @relation(fields: [produtoId], references: [id])
+  quantidade  Int
+  precoUnit   Float
+  subtotal    Float
+  status      String   @default("ENTREGUE") // PENDENTE, PREPARANDO, PRONTO, ENTREGUE
+  observacao  String?
+  mesaNumero  Int?
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+model ComandaPagamento {
+  id              String        @id @default(cuid())
+  comandaId       String
+  comanda         Comanda       @relation(fields: [comandaId], references: [id])
+  valor           Float
+  metodoPagamento String
+  movimentacaoId  String?       @unique
+  movimentacao    Movimentacao? @relation(fields: [movimentacaoId], references: [id])
+  criadoEm        DateTime      @default(now())
 }
 
 model ContaPagarReceber {

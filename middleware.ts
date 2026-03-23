@@ -2,7 +2,7 @@ export { default } from "next-auth/middleware";
 
 export const config = {
   matcher: [
-    // Protege tudo exceto login, api/auth e arquivos estaticos
-    "/((?!login|api/auth|_next/static|_next/image|favicon.ico).*)",
+    // Protege apenas paginas, nao APIs nem arquivos estaticos
+    "/((?!login|api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
