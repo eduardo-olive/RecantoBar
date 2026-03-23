@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RecantoBar — Fluxo do Sistema</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #253349;
+      --border: #334155;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-light: #60a5fa;
+      --green: #22c55e;
+      --green-dim: #166534;
+      --orange: #f59e0b;
+      --orange-dim: #92400e;
+      --red: #ef4444;
+      --red-dim: #991b1b;
+      --purple: #a78bfa;
+      --purple-dim: #5b21b6;
+      --cyan: #06b6d4;
+      --cyan-dim: #155e75;
+      --pink: #ec4899;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(139,92,246,0.06) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-light), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      position: relative;
+    }
+
+    /* Navigation */
+    .nav {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(59,130,246,0.1);
+      border-color: rgba(59,130,246,0.3);
+    }
+
+    /* Main container */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* Phase sections */
+    .phase {
+      margin-bottom: 3rem;
+    }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .phase-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .phase-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .phase-header .phase-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
+    }
+
+    /* Phase color variations */
+    .phase-1 .phase-number { background: rgba(139,92,246,0.2); color: var(--purple); }
+    .phase-2 .phase-number { background: rgba(59,130,246,0.2); color: var(--accent-light); }
+    .phase-3 .phase-number { background: rgba(6,182,212,0.2); color: var(--cyan); }
+    .phase-4 .phase-number { background: rgba(245,158,11,0.2); color: var(--orange); }
+    .phase-5 .phase-number { background: rgba(34,197,94,0.2); color: var(--green); }
+    .phase-6 .phase-number { background: rgba(239,68,68,0.2); color: var(--red); }
+    .phase-7 .phase-number { background: rgba(236,72,153,0.2); color: var(--pink); }
+
+    /* Step cards */
+    .step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .step:hover {
+      border-color: rgba(59,130,246,0.3);
+    }
+    .step h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .step h3 .badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .route-badge {
+      background: rgba(59,130,246,0.15);
+      color: var(--accent-light);
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem !important;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+    }
+    .step p, .step li {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+    .step ul, .step ol {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    .step li {
+      margin-bottom: 0.35rem;
+    }
+    .step li strong {
+      color: var(--text);
+    }
+
+    /* Tables */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 0.75rem 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.6rem 1rem;
+      background: rgba(59,130,246,0.08);
+      color: var(--accent-light);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid rgba(51,65,85,0.5);
+      color: var(--text-muted);
+    }
+    tr:hover td { background: rgba(59,130,246,0.03); }
+    td:first-child { color: var(--text); font-weight: 500; }
+
+    /* Note boxes */
+    .note {
+      background: rgba(59,130,246,0.08);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .note strong { color: var(--accent-light); }
+    .note.warning {
+      background: rgba(245,158,11,0.08);
+      border-left-color: var(--orange);
+    }
+    .note.warning strong { color: var(--orange); }
+    .note.success {
+      background: rgba(34,197,94,0.08);
+      border-left-color: var(--green);
+    }
+    .note.success strong { color: var(--green); }
+
+    /* Flow diagram */
+    .flow-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .flow-diagram h3 {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      color: var(--text);
+    }
+    .flow-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      border: 1px solid;
+    }
+    .flow-box.purple { background: rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.3); color: var(--purple); }
+    .flow-box.blue { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); color: var(--accent-light); }
+    .flow-box.cyan { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.3); color: var(--cyan); }
+    .flow-box.orange { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.3); color: var(--orange); }
+    .flow-box.green { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--green); }
+    .flow-box.red { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: var(--red); }
+    .flow-box.pink { background: rgba(236,72,153,0.15); border-color: rgba(236,72,153,0.3); color: var(--pink); }
+    .flow-arrow {
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .flow-arrow.down { display: block; text-align: center; margin: 0.3rem 0; }
+    .flow-split {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin: 0.5rem 0;
+    }
+    .flow-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .flow-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Kitchen workflow */
+    .kitchen-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+    .kitchen-step {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+    .kitchen-step.pending { background: rgba(239,68,68,0.15); color: var(--red); }
+    .kitchen-step.preparing { background: rgba(245,158,11,0.15); color: var(--orange); }
+    .kitchen-step.ready { background: rgba(34,197,94,0.15); color: var(--green); }
+    .kitchen-step.delivered { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+
+    /* Two column layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 0.75rem 0;
+    }
+    .col-card {
+      background: rgba(15,23,42,0.5);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .col-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Status badges inline */
+    .status {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status.green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .status.orange { background: rgba(245,158,11,0.15); color: var(--orange); }
+    .status.red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .status.gray { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+
+    /* Payment method pills */
+    .payment-methods {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+      flex-wrap: wrap;
+    }
+    .payment-pill {
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .payment-pill.cash { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: var(--green); }
+    .payment-pill.pix { background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.3); color: var(--cyan); }
+    .payment-pill.debit { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: var(--accent-light); }
+    .payment-pill.credit { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.3); color: var(--purple); }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 { font-size: 1.8rem; }
+      .two-col { grid-template-columns: 1fr; }
+      .flow-split { flex-direction: column; gap: 1rem; }
+      .container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>RecantoBar</h1>
+    <p>Fluxo Completo do Sistema &mdash; Do Cadastro &agrave; Venda</p>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#fase-1">1. Config Inicial</a>
+      <a href="#fase-2">2. Cadastros</a>
+      <a href="#fase-3">3. Estoque</a>
+      <a href="#fase-4">4. Caixa</a>
+      <a href="#fase-5">5. Vendas</a>
+      <a href="#fase-6">6. Cozinha</a>
+      <a href="#fase-7">7. Fechar Comanda</a>
+      <a href="#fluxo-visual">Fluxo Visual</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- ==================== FASE 1 ==================== -->
+    <section class="phase phase-1" id="fase-1">
+      <div class="phase-header">
+        <div class="phase-number">1</div>
+        <div>
+          <h2>Configura&ccedil;&atilde;o Inicial</h2>
+          <div class="phase-desc">Perfis de acesso e usu&aacute;rios do sistema</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Criar Perfis / Cargos <span class="badge route-badge">/perfis</span></h3>
+        <p>Defina os cargos do estabelecimento e suas permiss&otilde;es de acesso:</p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Perfil Exemplo</th><th>Permiss&otilde;es</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Gerente</td><td>vendas, caixa, estoque, financeiro, relatorios, admin, usuarios</td></tr>
+              <tr><td>Gar&ccedil;om</td><td>vendas</td></tr>
+              <tr><td>Cozinheiro</td><td>vendas (tela cozinha)</td></tr>
+              <tr><td>Caixa</td><td>vendas, caixa</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <strong>Dica:</strong> As permiss&otilde;es controlam quais menus aparecem na barra lateral. Um gar&ccedil;om s&oacute; ver&aacute; o PDV e as mesas.
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Criar Usu&aacute;rios <span class="badge route-badge">/usuarios</span></h3>
+        <p>Cadastre os funcion&aacute;rios que v&atilde;o operar o sistema:</p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Campo</th><th>Obrigat&oacute;rio</th><th>Descri&ccedil;&atilde;o</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Nome</td><td>Sim</td><td>Nome completo do funcion&aacute;rio</td></tr>
+              <tr><td>Email</td><td>Sim</td><td>&Uacute;nico &mdash; usado para login</td></tr>
+              <tr><td>Senha</td><td>Sim</td><td>Criptografada automaticamente (bcrypt)</td></tr>
+              <tr><td>Perfil</td><td>Sim</td><td>Selecione entre os perfis cadastrados</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note success">
+          <strong>Recurso:</strong> Voc&ecirc; pode ativar/desativar usu&aacute;rios sem exclu&iacute;-los, mantendo o hist&oacute;rico.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FASE 2 ==================== -->
+    <section class="phase phase-2" id="fase-2">
+      <div class="phase-header">
+        <div class="phase-number">2</div>
+        <div>
+          <h2>Cadastros Base</h2>
+          <div class="phase-desc">Categorias, produtos e mesas</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Criar Categorias <span class="badge route-badge">/categorias</span></h3>
+        <p>Organize seus produtos em categorias:</p>
+        <ul>
+          <li>Digite o nome da categoria (ex: <strong>Bebidas</strong>, <strong>Pratos</strong>, <strong>Por&ccedil;&otilde;es</strong>, <strong>Sobremesas</strong>)</li>
+          <li>Clique em <strong>"ADICIONAR"</strong></li>
+          <li>Categorias aparecem como cards em grade</li>
+          <li>Cada card tem bot&atilde;o de excluir (com confirma&ccedil;&atilde;o)</li>
+        </ul>
+        <div class="note warning">
+          <strong>Valida&ccedil;&atilde;o:</strong> O nome da categoria deve ser &uacute;nico. N&atilde;o &eacute; poss&iacute;vel criar duas categorias com o mesmo nome.
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Criar Produtos <span class="badge route-badge">/produtos</span></h3>
+        <p>Cadastre todos os itens do card&aacute;pio:</p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Campo</th><th>Obrigat&oacute;rio</th><th>Descri&ccedil;&atilde;o</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Nome</td><td>Sim</td><td>Convertido para MAI&Uacute;SCULO automaticamente</td></tr>
+              <tr><td>Categoria</td><td>Sim</td><td>Dropdown das categorias cadastradas (A-Z)</td></tr>
+              <tr><td>Estoque M&iacute;nimo</td><td>N&atilde;o</td><td>Alerta no dashboard quando atingir esse n&iacute;vel</td></tr>
+              <tr><td>Capacidade M&aacute;xima</td><td>N&atilde;o</td><td>Estoque de seguran&ccedil;a ideal</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <strong>Importante:</strong> Pre&ccedil;o de venda, pre&ccedil;o de custo e estoque come&ccedil;am em <strong>zero</strong>. Ser&atilde;o definidos na entrada de estoque (Fase 3).
+        </div>
+        <p style="margin-top: 0.5rem;">A tabela de produtos mostra: nome, categoria (badge colorido), metas min/m&aacute;x, estoque atual. Estoque em <span class="status red">vermelho</span> quando cr&iacute;tico.</p>
+      </div>
+
+      <div class="step">
+        <h3>Criar Mesas <span class="badge route-badge">/mesas</span></h3>
+        <p>Configure as mesas do estabelecimento:</p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Campo</th><th>Obrigat&oacute;rio</th><th>Descri&ccedil;&atilde;o</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>N&uacute;mero</td><td>Sim</td><td>&Uacute;nico &mdash; identifica a mesa</td></tr>
+              <tr><td>Nome</td><td>N&atilde;o</td><td>Ex: "Varanda", "Sal&atilde;o", "VIP"</td></tr>
+              <tr><td>Capacidade</td><td>N&atilde;o</td><td>Padr&atilde;o: 4 lugares</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top: 0.5rem;">As mesas s&atilde;o exibidas como cards coloridos por status:</p>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+          <span class="status green">LIVRE</span>
+          <span class="status orange">OCUPADA</span>
+          <span style="display:inline-block;padding:0.1rem 0.5rem;border-radius:9999px;font-size:0.75rem;font-weight:600;background:rgba(245,158,11,0.25);color:#fbbf24;">COMANDA ABERTA</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FASE 3 ==================== -->
+    <section class="phase phase-3" id="fase-3">
+      <div class="phase-header">
+        <div class="phase-number">3</div>
+        <div>
+          <h2>Abastecimento de Estoque</h2>
+          <div class="phase-desc">Entrada de mercadorias e ajustes</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Entrada de Estoque / Compras <span class="badge route-badge">/compras</span></h3>
+        <p>Registre a entrada de mercadorias com pre&ccedil;os:</p>
+        <div class="two-col">
+          <div class="col-card">
+            <h4>Painel Esquerdo &mdash; Busca</h4>
+            <ol>
+              <li>Busque o produto pelo nome</li>
+              <li>Clique no card do produto</li>
+              <li>Modal abre com:
+                <ul>
+                  <li><strong>Quantidade</strong> (bot&otilde;es +/-)</li>
+                  <li><strong>Custo Unit&aacute;rio</strong> (R$)</li>
+                  <li><strong>Novo Pre&ccedil;o Venda</strong> (R$)</li>
+                </ul>
+              </li>
+              <li>Clique "Adicionar &agrave; Lista"</li>
+            </ol>
+          </div>
+          <div class="col-card">
+            <h4>Painel Direito &mdash; Lista de Entrada</h4>
+            <ol>
+              <li>Itens adicionados aparecem aqui</li>
+              <li>Mostra qtd &times; custo unit&aacute;rio de cada item</li>
+              <li>Total do investimento no rodap&eacute;</li>
+              <li>Clique <strong>"CONFIRMAR ENTRADA"</strong></li>
+            </ol>
+          </div>
+        </div>
+        <div class="note success">
+          <strong>Resultado:</strong> Estoque atualizado, pre&ccedil;os de custo/venda definidos, movimenta&ccedil;&otilde;es de COMPRA criadas e saldo do caixa ajustado.
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Ajuste de Estoque <span class="badge route-badge">/ajuste-estoque</span></h3>
+        <p>Ajuste r&aacute;pido de quantidades e pre&ccedil;os direto na tabela:</p>
+        <ul>
+          <li>Tabela edit&aacute;vel: <strong>Produto | Estoque | Custo (R$) | Venda (R$) | Margem %</strong></li>
+          <li>Clique na c&eacute;lula para editar o valor</li>
+          <li>Margem calculada em tempo real e colorida:
+            <span class="status green">&gt;50%</span>
+            <span style="display:inline-block;padding:0.1rem 0.5rem;border-radius:9999px;font-size:0.75rem;font-weight:600;background:rgba(59,130,246,0.15);color:#60a5fa;">&gt;30%</span>
+            <span class="status orange">&gt;15%</span>
+            <span class="status red">&lt;15%</span>
+          </li>
+          <li>Barra superior mostra quantos itens foram alterados</li>
+          <li>Salva todas as altera&ccedil;&otilde;es de uma vez</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ==================== FASE 4 ==================== -->
+    <section class="phase phase-4" id="fase-4">
+      <div class="phase-header">
+        <div class="phase-number">4</div>
+        <div>
+          <h2>Abertura do Caixa</h2>
+          <div class="phase-desc">Obrigat&oacute;rio antes de vender</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Abrir Caixa <span class="badge route-badge">/caixa/saldo-inicial</span></h3>
+        <ol>
+          <li>Informe o <strong>valor inicial</strong> em dinheiro (troco do dia)</li>
+          <li>Clique <strong>"CONFIRMAR SALDO"</strong></li>
+          <li>Sistema cria o caixa com status <span class="status green">aberto</span></li>
+          <li>Redireciona para o Dashboard</li>
+        </ol>
+        <div class="note warning">
+          <strong>Regra:</strong> S&oacute; pode haver <strong>1 caixa aberto</strong> por vez em todo o sistema. Vendas s&oacute; funcionam com caixa aberto.
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Gest&atilde;o do Caixa <span class="badge route-badge">/caixa</span></h3>
+        <p>Com o caixa aberto, voc&ecirc; pode realizar:</p>
+        <div class="two-col">
+          <div class="col-card">
+            <h4 style="color: var(--red);">Sangria (Retirada)</h4>
+            <ul>
+              <li>Valor a retirar (R$)</li>
+              <li>Motivo da retirada</li>
+              <li>Saldo do caixa diminui</li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h4 style="color: var(--green);">Suprimento (Adi&ccedil;&atilde;o)</h4>
+            <ul>
+              <li>Valor a adicionar (R$)</li>
+              <li>Motivo da adi&ccedil;&atilde;o</li>
+              <li>Saldo do caixa aumenta</li>
+            </ul>
+          </div>
+        </div>
+        <div style="margin-top: 1rem;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem;">Fechar Caixa (fim do dia)</h4>
+          <ol>
+            <li>Conte o dinheiro f&iacute;sico na gaveta</li>
+            <li>Informe o <strong>"Valor Contado"</strong></li>
+            <li>Sistema mostra o <strong>"Valor Esperado"</strong></li>
+            <li>Calcula a <strong>diferen&ccedil;a</strong> (sobra ou falta)</li>
+            <li>Adicione observa&ccedil;&otilde;es se necess&aacute;rio</li>
+            <li>Confirme o fechamento</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FASE 5 ==================== -->
+    <section class="phase phase-5" id="fase-5">
+      <div class="phase-header">
+        <div class="phase-number">5</div>
+        <div>
+          <h2>Vendas (PDV)</h2>
+          <div class="phase-desc">Dois modos: venda direta e comanda</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Tela do PDV <span class="badge route-badge">/</span></h3>
+        <div class="two-col">
+          <div class="col-card">
+            <h4>Painel Esquerdo &mdash; Produtos</h4>
+            <ul>
+              <li>Campo de busca por nome</li>
+              <li>Grade de cards com: nome, estoque, pre&ccedil;o</li>
+              <li>Cards <span class="status gray">desabilitados</span> se estoque = 0</li>
+              <li>Clique no card &rarr; modal de quantidade</li>
+              <li>Modal valida: n&atilde;o permite exceder estoque</li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h4>Painel Direito &mdash; Carrinho</h4>
+            <ul>
+              <li>Lista de itens com qtd, pre&ccedil;o, subtotal</li>
+              <li>Bot&atilde;o de remover (lixeira vermelha)</li>
+              <li>Seletor de mesa (opcional)</li>
+              <li>Total a pagar em destaque</li>
+              <li>M&eacute;todos de pagamento</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top: 1rem; font-weight: 500;">M&eacute;todos de Pagamento dispon&iacute;veis:</p>
+        <div class="payment-methods">
+          <span class="payment-pill cash">DINHEIRO</span>
+          <span class="payment-pill pix">PIX</span>
+          <span class="payment-pill debit">D&Eacute;BITO</span>
+          <span class="payment-pill credit">CR&Eacute;DITO</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Modo A &mdash; Venda Direta <span class="status green">paga na hora</span></h3>
+        <ol>
+          <li>Busque e adicione produtos ao carrinho</li>
+          <li>(Opcional) Selecione uma mesa</li>
+          <li>Escolha o m&eacute;todo de pagamento</li>
+          <li>Clique <strong>"FINALIZAR VENDA"</strong> (bot&atilde;o verde)</li>
+        </ol>
+        <div class="note success">
+          <strong>Sistema processa:</strong> Desconta estoque &rarr; Cria movimenta&ccedil;&atilde;o financeira &rarr; Atualiza saldo do caixa &rarr; Limpa carrinho
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Modo B &mdash; Venda por Comanda <span class="status orange">paga depois</span></h3>
+        <ol>
+          <li><strong>Selecione uma mesa</strong> no PDV</li>
+          <li>Se n&atilde;o tem comanda aberta &rarr; bot&atilde;o <strong>"ABRIR COMANDA"</strong> aparece</li>
+          <li>Informe o nome do cliente (opcional) e abra a comanda</li>
+          <li>Carrinho muda para modo <span class="status orange">COMANDA</span> (visual laranja)</li>
+          <li>Adicione produtos ao carrinho</li>
+          <li>Clique <strong>"ENVIAR PEDIDO"</strong> (bot&atilde;o laranja)</li>
+          <li>Pode enviar <strong>m&uacute;ltiplos pedidos</strong> para a mesma comanda</li>
+          <li>Itens com preparo v&atilde;o para a <strong>Cozinha</strong></li>
+        </ol>
+        <div class="note warning">
+          <strong>Aten&ccedil;&atilde;o:</strong> Na comanda, o dinheiro <strong>n&atilde;o entra no caixa ainda</strong>. O estoque &eacute; descontado, mas a cobran&ccedil;a s&oacute; acontece ao fechar a comanda (Fase 7).
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FASE 6 ==================== -->
+    <section class="phase phase-6" id="fase-6">
+      <div class="phase-header">
+        <div class="phase-number">6</div>
+        <div>
+          <h2>Cozinha</h2>
+          <div class="phase-desc">Acompanhamento de pedidos com preparo</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Tela da Cozinha <span class="badge route-badge">/cozinha</span></h3>
+        <p>Atualiza automaticamente a cada <strong>10 segundos</strong>. Mostra pedidos agrupados por mesa.</p>
+
+        <div class="kitchen-flow">
+          <div class="kitchen-step pending">PENDENTE</div>
+          <span class="flow-arrow">&rarr;</span>
+          <span style="font-size:0.75rem;color:var(--text-muted);">clicar "Preparar"</span>
+          <span class="flow-arrow">&rarr;</span>
+          <div class="kitchen-step preparing">PREPARANDO</div>
+          <span class="flow-arrow">&rarr;</span>
+          <span style="font-size:0.75rem;color:var(--text-muted);">clicar "Pronto"</span>
+          <span class="flow-arrow">&rarr;</span>
+          <div class="kitchen-step ready">PRONTO</div>
+          <span class="flow-arrow">&rarr;</span>
+          <span style="font-size:0.75rem;color:var(--text-muted);">clicar "Entregue"</span>
+          <span class="flow-arrow">&rarr;</span>
+          <div class="kitchen-step delivered">ENTREGUE</div>
+        </div>
+
+        <ul style="margin-top: 1rem;">
+          <li>Cada card mostra: <strong>qtd &times; produto</strong>, tempo decorrido, status</li>
+          <li>Contadores no topo: X pendentes, X preparando, X prontos</li>
+          <li>Produtos <strong>sem preparo</strong> (ex: bebidas) pulam direto para ENTREGUE</li>
+        </ul>
+        <div class="note">
+          <strong>Dica:</strong> Marque o campo <code>requerPreparo</code> como <strong>true</strong> nos produtos que passam pela cozinha (pratos, por&ccedil;&otilde;es). Bebidas e itens simples ficam como false e n&atilde;o aparecem na cozinha.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FASE 7 ==================== -->
+    <section class="phase phase-7" id="fase-7">
+      <div class="phase-header">
+        <div class="phase-number">7</div>
+        <div>
+          <h2>Fechamento de Comanda</h2>
+          <div class="phase-desc">Cobran&ccedil;a e libera&ccedil;&atilde;o da mesa</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Visualizar Comanda <span class="badge route-badge">/mesas</span></h3>
+        <p>Na tela de Mesas, mesas com comanda aberta t&ecirc;m visual <span class="status orange">&acirc;mbar</span>:</p>
+        <ul>
+          <li>Clique no &iacute;cone de <strong>olho</strong> para ver todos os pedidos</li>
+          <li>Modal mostra cada pedido com: hor&aacute;rio, itens, valores, status (pago/pendente)</li>
+          <li>Total geral da comanda no rodap&eacute;</li>
+        </ul>
+      </div>
+
+      <div class="step">
+        <h3>Fechar Comanda e Receber Pagamento</h3>
+        <ol>
+          <li>Clique no &iacute;cone de <strong>cart&atilde;o</strong> na mesa ou "Fechar Comanda" no modal</li>
+          <li>Resumo de todos os pedidos e total aparece</li>
+          <li>Escolha o <strong>m&eacute;todo de pagamento</strong> e informe o valor</li>
+          <li>Para <strong>dividir</strong>: clique em "Dividir" e adicione m&uacute;ltiplos pagamentos</li>
+        </ol>
+
+        <div class="two-col" style="margin-top: 0.75rem;">
+          <div class="col-card">
+            <h4>Exemplo: Pagamento &Uacute;nico</h4>
+            <ul>
+              <li>Total: R$ 85,00</li>
+              <li>PIX: R$ 85,00</li>
+              <li><span class="status green">Valores conferem</span></li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h4>Exemplo: Pagamento Dividido</h4>
+            <ul>
+              <li>Total: R$ 85,00</li>
+              <li>PIX: R$ 50,00</li>
+              <li>DINHEIRO: R$ 35,00</li>
+              <li><span class="status green">Valores conferem</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="note success" style="margin-top: 1rem;">
+          <strong>Ao confirmar:</strong> Cria movimenta&ccedil;&otilde;es financeiras &rarr; Atualiza saldo do caixa &rarr; Fecha comanda &rarr; Marca pedidos como pagos &rarr; Mesa volta para <span class="status green">LIVRE</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FLUXO VISUAL ==================== -->
+    <div class="flow-diagram" id="fluxo-visual">
+      <h3>Fluxo Visual Completo</h3>
+
+      <!-- Setup row -->
+      <div class="flow-row">
+        <div class="flow-box purple">Perfis</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-box purple">Usu&aacute;rios</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-box blue">Categorias</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-box blue">Produtos</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-box blue">Mesas</div>
+      </div>
+
+      <div class="flow-arrow down">&darr;</div>
+
+      <div class="flow-row">
+        <div class="flow-box cyan">Entrada de Estoque (pre&ccedil;os + quantidades)</div>
+      </div>
+
+      <div class="flow-arrow down">&darr;</div>
+
+      <div class="flow-row">
+        <div class="flow-box orange">Abrir Caixa (valor inicial)</div>
+      </div>
+
+      <div class="flow-arrow down">&darr;</div>
+
+      <!-- Split -->
+      <div class="flow-split">
+        <div class="flow-branch">
+          <div class="flow-label">Modo Direto</div>
+          <div class="flow-box green">Venda Direta</div>
+          <span class="flow-arrow">&darr;</span>
+          <div class="flow-label">Paga na hora</div>
+          <div class="flow-box green">Caixa Atualizado</div>
+        </div>
+        <div class="flow-branch">
+          <div class="flow-label">Modo Comanda</div>
+          <div class="flow-box orange">Abrir Comanda</div>
+          <span class="flow-arrow">&darr;</span>
+          <div class="flow-box orange">Enviar Pedidos</div>
+          <span class="flow-arrow">&darr;</span>
+          <div class="flow-box red">Cozinha (preparo)</div>
+          <span class="flow-arrow">&darr;</span>
+          <div class="flow-box pink">Fechar Comanda</div>
+          <span class="flow-arrow">&darr;</span>
+          <div class="flow-label">Paga ao fechar</div>
+          <div class="flow-box green">Caixa Atualizado</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow down">&darr;</div>
+
+      <div class="flow-row">
+        <div class="flow-box orange">Fechar Caixa (confer&ecirc;ncia)</div>
+      </div>
+
+      <div class="flow-arrow down">&darr;</div>
+
+      <div class="flow-row">
+        <div class="flow-box purple">Dashboard / Relat&oacute;rios / DRE</div>
+      </div>
+    </div>
+
+    <!-- ==================== EXTRAS ==================== -->
+    <section class="phase phase-6" style="margin-top: 2rem;">
+      <div class="phase-header">
+        <div class="phase-number" style="font-size:1rem;">+</div>
+        <div>
+          <h2>Opera&ccedil;&otilde;es Complementares</h2>
+          <div class="phase-desc">Despesas, perdas, contas e relat&oacute;rios</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Despesas Operacionais <span class="badge route-badge">/despesas</span></h3>
+        <p>Registre custos fixos e vari&aacute;veis do bar:</p>
+        <ul>
+          <li><strong>Subcategorias:</strong> Aluguel, Luz, &Aacute;gua, Internet, Sal&aacute;rios, Fornecedores, Manuten&ccedil;&atilde;o, Limpeza, Outros</li>
+          <li>Informe descri&ccedil;&atilde;o e valor &rarr; cria movimenta&ccedil;&atilde;o de DESPESA</li>
+        </ul>
+      </div>
+
+      <div class="step">
+        <h3>Registro de Perdas <span class="badge route-badge">/perdas</span></h3>
+        <p>Registre produtos perdidos com impacto financeiro autom&aacute;tico:</p>
+        <ul>
+          <li>Selecione produto, quantidade e motivo (<strong>Vencimento</strong>, <strong>Quebra</strong> ou <strong>Consumo Interno</strong>)</li>
+          <li>Valor da perda = quantidade &times; pre&ccedil;o de custo (calculado automaticamente)</li>
+          <li>Desconta do estoque e aparece nos KPIs do dashboard</li>
+        </ul>
+      </div>
+
+      <div class="step">
+        <h3>Contas a Pagar / Receber <span class="badge route-badge">/contas</span></h3>
+        <ul>
+          <li>Cadastre contas com: tipo (PAGAR/RECEBER), descri&ccedil;&atilde;o, valor, vencimento, categoria</li>
+          <li>Cards resumo: Total a Pagar, Total a Receber, Saldo Previsto</li>
+          <li>Contas vencidas ficam <span class="status red">destacadas em vermelho</span></li>
+          <li>Marque como paga ou cancelada quando resolver</li>
+          <li>Filtre por tipo e status</li>
+        </ul>
+      </div>
+
+      <div class="step">
+        <h3>Relat&oacute;rios</h3>
+        <div class="two-col">
+          <div class="col-card">
+            <h4><span class="badge route-badge">/dashboard/relatorios/dre</span></h4>
+            <p style="color:var(--text-muted);font-size:0.85rem;">DRE &mdash; Demonstrativo de Resultado: Receita - CMV - Despesas - Perdas = Resultado L&iacute;quido</p>
+          </div>
+          <div class="col-card">
+            <h4><span class="badge route-badge">/dashboard/relatorios/margem</span></h4>
+            <p style="color:var(--text-muted);font-size:0.85rem;">Margem por produto e categoria com potencial de lucro</p>
+          </div>
+        </div>
+        <div class="two-col" style="margin-top: 0.5rem;">
+          <div class="col-card">
+            <h4><span class="badge route-badge">/dashboard/relatorios/compras</span></h4>
+            <p style="color:var(--text-muted);font-size:0.85rem;">Sugest&atilde;o de compra baseada em estoque m&iacute;nimo e tend&ecirc;ncias</p>
+          </div>
+          <div class="col-card">
+            <h4><span class="badge route-badge">/dashboard/relatorios</span></h4>
+            <p style="color:var(--text-muted);font-size:0.85rem;">Relat&oacute;rio geral com filtro por per&iacute;odo e exporta&ccedil;&atilde;o PDF</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="footer">
+    RecantoBar &mdash; Sistema de PDV e Fluxo de Caixa &mdash; Documenta&ccedil;&atilde;o gerada em Mar&ccedil;o 2026
+  </div>
+
+</body>
+</html>

@@ -9,7 +9,8 @@ import {
   AlertTriangle, FileText, Truck, Moon, Sun,
   ClipboardList, ChevronDown, Banknote, Coins, Wallet,
   Receipt, BarChart3, CreditCard, TrendingUp,
-  Users, Settings, LogOut, User, ClipboardCheck, Grid3X3, UtensilsCrossed
+  Users, Settings, LogOut, User, ClipboardCheck, Grid3X3, UtensilsCrossed,
+  BookOpen
 } from "lucide-react";
 
 export function Sidebar() {
@@ -84,6 +85,7 @@ export function Sidebar() {
       items: [
         { name: "Usuários", path: "/usuarios", icon: Users },
         { name: "Perfis / Cargos", path: "/configuracoes", icon: Settings },
+        { name: "Guia do Sistema", path: "/guia", icon: BookOpen },
       ]
     }
   ];

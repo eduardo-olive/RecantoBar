@@ -65,6 +65,8 @@ export default function VendasPDV() {
   };
 
   const temComanda = !!comandaAberta;
+  const temMesa = !!mesaSelecionada;
+  const modoMesa = temMesa || temComanda;
 
   const totalCarrinho = carrinho.reduce((acc, item) => acc + (item.preco * item.qtd), 0);
 
@@ -107,14 +109,32 @@ export default function VendasPDV() {
         })),
       };
 
-      if (temComanda) {
-        // Pedido na comanda — sem pagamento agora
-        body.comandaId = comandaAberta.id;
+      if (modoMesa) {
+        // Com mesa: abrir comanda automaticamente se não tiver
+        let comandaId = comandaAberta?.id;
+
+        if (!comandaId && mesaSelecionada) {
+          const resComanda = await fetch('/api/comandas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mesaId: mesaSelecionada.id }),
+          });
+          if (resComanda.ok) {
+            const novaComanda = await resComanda.json();
+            comandaId = novaComanda.id;
+          } else {
+            const err = await resComanda.json();
+            alert(err.error || "Erro ao abrir comanda.");
+            setLoading(false);
+            return;
+          }
+        }
+
+        body.comandaId = comandaId;
         body.mesaId = mesaSelecionada?.id || null;
       } else {
-        // Venda normal — paga na hora
+        // Venda normal sem mesa — paga na hora
         body.metodoPagamento = metodoPagamento;
-        body.mesaId = mesaSelecionada?.id || null;
       }
 
       const res = await fetch('/api/movimentacoes/venda', {
@@ -124,18 +144,19 @@ export default function VendasPDV() {
       });
 
       if (res.ok) {
-        if (temComanda) {
-          alert("Pedido adicionado à comanda!");
-          setCarrinho([]);
-          // Mantém mesa e comanda selecionadas para próximo pedido
-        } else {
-          alert("Venda finalizada!");
-          setCarrinho([]);
-          setMesaSelecionada(null);
-          setComandaAberta(null);
-        }
+        setCarrinho([]);
+        setMesaSelecionada(null);
+        setComandaAberta(null);
+        setBusca("");
         carregarProdutos();
         carregarMesas();
+
+        if (modoMesa) {
+          alert("Pedido enviado para a mesa!");
+        } else {
+          setMetodoPagamento("PIX");
+          alert("Venda finalizada!");
+        }
       } else {
         const err = await res.json();
         alert(err.error || "Erro ao processar.");
@@ -196,15 +217,16 @@ export default function VendasPDV() {
         </section>
 
         {/* CARRINHO DARK COMPACTO */}
-        <section className={`lg:col-span-5 rounded-[35px] p-6 text-white shadow-2xl relative overflow-hidden flex flex-col h-[600px] border ${temComanda ? 'bg-[#1a1000] border-orange-500/20' : 'bg-[#0f172a] border-white/5'}`}>
+        <section className={`lg:col-span-5 rounded-[35px] p-6 text-white shadow-2xl relative overflow-hidden flex flex-col h-[600px] border ${modoMesa ? 'bg-[#1a1000] border-orange-500/20' : 'bg-[#0f172a] border-white/5'}`}>
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-black uppercase italic tracking-tighter">
-                {temComanda ? "COMANDA" : "CARRINHO"}
+                {modoMesa ? "PEDIDO" : "CARRINHO"}
               </h2>
-              {temComanda && mesaSelecionada && (
+              {mesaSelecionada && (
                 <span className="bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1">
                   <ClipboardList size={10} /> Mesa {mesaSelecionada.numero}
+                  {temComanda && <span className="text-orange-300/70 ml-1">• COMANDA</span>}
                 </span>
               )}
             </div>
@@ -215,10 +237,10 @@ export default function VendasPDV() {
             {carrinho.map(item => (
               <div key={item.produtoId} className="bg-slate-800/30 p-3 rounded-[18px] border border-white/5 flex justify-between items-center group transition-all hover:bg-slate-800/50">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${temComanda ? 'bg-orange-500/10 text-orange-400' : 'bg-blue-500/10 text-blue-400'}`}><Package size={14} /></div>
+                  <div className={`p-2 rounded-lg ${modoMesa ? 'bg-orange-500/10 text-orange-400' : 'bg-blue-500/10 text-blue-400'}`}><Package size={14} /></div>
                   <div className="flex flex-col">
                     <h4 className="font-black text-xs uppercase italic truncate w-32 leading-none tracking-tighter">{item.nome}</h4>
-                    <p className={`text-[9px] font-black uppercase mt-1 tracking-widest ${temComanda ? 'text-orange-400' : 'text-blue-400'}`}>
+                    <p className={`text-[9px] font-black uppercase mt-1 tracking-widest ${modoMesa ? 'text-orange-400' : 'text-blue-400'}`}>
                       {item.qtd} UN <span className="text-slate-600 mx-1">|</span> R$ {item.preco.toFixed(2)}
                     </p>
                   </div>
@@ -282,15 +304,15 @@ export default function VendasPDV() {
             {/* TOTAL */}
             <div className="flex flex-col">
               <span className="text-[9px] font-black text-slate-500 uppercase italic mb-1">
-                {temComanda ? "TOTAL DO PEDIDO" : "TOTAL A PAGAR"}
+                {modoMesa ? "TOTAL DO PEDIDO" : "TOTAL A PAGAR"}
               </span>
-              <h3 className={`text-4xl font-black italic tracking-tighter font-mono leading-none ${temComanda ? 'text-orange-400' : 'text-emerald-500'}`}>
+              <h3 className={`text-4xl font-black italic tracking-tighter font-mono leading-none ${modoMesa ? 'text-orange-400' : 'text-emerald-500'}`}>
                 R$ {totalCarrinho.toFixed(2)}
               </h3>
             </div>
 
-            {/* PAGAMENTO — só mostra se NÃO for comanda */}
-            {!temComanda && (
+            {/* PAGAMENTO — só mostra se NÃO tiver mesa selecionada */}
+            {!modoMesa && (
               <div className="flex gap-1.5">
                 {['DINHEIRO', 'PIX', 'DÉBITO', 'CRÉDITO'].map((m) => (
                   <button key={m} onClick={() => setMetodoPagamento(m)} className={`flex-1 py-2.5 rounded-xl text-[8px] font-black border transition-all ${metodoPagamento === m ? 'border-emerald-500 bg-emerald-500 text-slate-900' : 'border-slate-800 bg-slate-900 text-slate-500 hover:text-white'}`}>{m}</button>
@@ -303,12 +325,12 @@ export default function VendasPDV() {
               onClick={finalizarVenda}
               disabled={carrinho.length === 0 || loading}
               className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 transition-all shadow-lg disabled:opacity-20 ${
-                temComanda
+                modoMesa
                   ? 'bg-orange-500 hover:bg-orange-400 text-slate-900 shadow-orange-500/10'
                   : 'bg-emerald-500 hover:bg-emerald-400 text-slate-900 shadow-emerald-500/10'
               }`}
             >
-              {temComanda ? (
+              {modoMesa ? (
                 <><Send size={18} /> {loading ? "ENVIANDO..." : "ENVIAR PEDIDO"}</>
               ) : (
                 <><CheckCircle2 size={18} /> {loading ? "GRAVANDO..." : "FINALIZAR VENDA"}</>
