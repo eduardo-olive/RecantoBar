@@ -93,7 +93,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         return true;
       } else {
         const erro = await res.json();
-        alert(erro.error || "Erro ao salvar categoria");
+        console.error(erro.error || "Erro ao salvar categoria");
         return false;
       }
     } catch (error) {
@@ -114,7 +114,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         return true;
       } else {
         const erro = await res.json();
-        alert(erro.error || "Erro ao excluir. Verifique se há produtos vinculados.");
+        console.error(erro.error || "Erro ao excluir. Verifique se há produtos vinculados.");
         return false;
       }
     } catch (error) {

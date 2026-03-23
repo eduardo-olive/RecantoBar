@@ -6,8 +6,10 @@ import {
   History, AlertCircle, Minus, Plus
 } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "../components/Toast";
 
 export default function CaixaPage() {
+  const toast = useToast();
   const [caixaAtual, setCaixaAtual] = useState<any>(null);
   const [historico, setHistorico] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,8 +46,8 @@ export default function CaixaPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ valor: Number(modalValor), motivo: modalMotivo }),
     });
-    if (res.ok) { setModal(""); setModalValor(""); setModalMotivo(""); carregar(); alert("Sangria realizada!"); }
-    else { const err = await res.json(); alert(err.error); }
+    if (res.ok) { setModal(""); setModalValor(""); setModalMotivo(""); carregar(); toast.success("Sangria realizada!"); }
+    else { const err = await res.json(); toast.error(err.error); }
   };
 
   const executarSuprimento = async () => {
@@ -55,8 +57,8 @@ export default function CaixaPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ valor: Number(modalValor), motivo: modalMotivo }),
     });
-    if (res.ok) { setModal(""); setModalValor(""); setModalMotivo(""); carregar(); alert("Suprimento realizado!"); }
-    else { const err = await res.json(); alert(err.error); }
+    if (res.ok) { setModal(""); setModalValor(""); setModalMotivo(""); carregar(); toast.success("Suprimento realizado!"); }
+    else { const err = await res.json(); toast.error(err.error); }
   };
 
   const executarFechamento = async () => {
@@ -73,8 +75,8 @@ export default function CaixaPage() {
       setModalObs("");
       carregar();
       const dif = Number(data.resumo.diferenca);
-      alert(`Caixa fechado!\nEsperado: R$ ${Number(data.resumo.valor_esperado).toFixed(2)}\nContado: R$ ${Number(data.resumo.valor_contado).toFixed(2)}\nDiferença: R$ ${dif.toFixed(2)} ${dif >= 0 ? "(sobra)" : "(falta)"}`);
-    } else { const err = await res.json(); alert(err.error); }
+      toast.success(`Caixa fechado! Esperado: R$ ${Number(data.resumo.valor_esperado).toFixed(2)} | Contado: R$ ${Number(data.resumo.valor_contado).toFixed(2)} | Diferença: R$ ${dif.toFixed(2)} ${dif >= 0 ? "(sobra)" : "(falta)"}`);
+    } else { const err = await res.json(); toast.error(err.error); }
   };
 
   if (loading) {

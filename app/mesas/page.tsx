@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Edit3, Trash2, Users, X, Save, Eye, ClipboardList, CreditCard, Banknote } from "lucide-react";
+import { useToast } from "../components/Toast";
 
 interface Mesa {
   id: number;
@@ -46,6 +47,7 @@ interface Pagamento {
 }
 
 export default function MesasPage() {
+  const toast = useToast();
   const [mesas, setMesas] = useState<Mesa[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -108,7 +110,7 @@ export default function MesasPage() {
       carregar();
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
   };
 
@@ -147,7 +149,7 @@ export default function MesasPage() {
       carregar();
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
   };
 
@@ -189,7 +191,7 @@ export default function MesasPage() {
     const diff = Math.abs(totalComanda - totalPagamentos);
 
     if (diff > 0.01) {
-      alert(`Total dos pagamentos (R$ ${totalPagamentos.toFixed(2)}) difere do total da comanda (R$ ${totalComanda.toFixed(2)})`);
+      toast.warning(`Total dos pagamentos (R$ ${totalPagamentos.toFixed(2)}) difere do total da comanda (R$ ${totalComanda.toFixed(2)})`);
       return;
     }
 
@@ -207,13 +209,13 @@ export default function MesasPage() {
     });
 
     if (res.ok) {
-      alert("Comanda fechada com sucesso!");
+      toast.success("Comanda fechada com sucesso!");
       setFechandoComanda(null);
       setPagamentos([{ valor: "", metodoPagamento: "DINHEIRO" }]);
       carregar();
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
     setProcessando(false);
   };
@@ -227,7 +229,7 @@ export default function MesasPage() {
       carregar();
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
   };
 

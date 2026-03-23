@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Users, Plus, CheckCircle2, XCircle, KeyRound, UserCheck, UserX } from "lucide-react";
+import { useToast } from "../components/Toast";
 
 export default function UsuariosPage() {
+  const toast = useToast();
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [perfis, setPerfis] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -33,7 +35,7 @@ export default function UsuariosPage() {
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nome || !email || !perfilId || (!editId && !senha)) {
-      alert("Preencha todos os campos!"); return;
+      toast.warning("Preencha todos os campos!"); return;
     }
 
     const body: any = { nome, email, perfilId };
@@ -48,8 +50,8 @@ export default function UsuariosPage() {
       body: JSON.stringify(body),
     });
 
-    if (res.ok) { limparForm(); carregar(); }
-    else { const err = await res.json(); alert(err.error); }
+    if (res.ok) { limparForm(); carregar(); toast.success("Usuário salvo!"); }
+    else { const err = await res.json(); toast.error(err.error); }
   };
 
   const toggleAtivo = async (id: string, ativo: boolean) => {

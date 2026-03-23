@@ -2,6 +2,7 @@ import './globals.css';
 import { DataProvider } from './DataContext';
 import { AuthProvider } from './components/AuthProvider';
 import { AppShell } from './components/AppShell';
+import { ToastProvider } from './components/Toast';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,11 +23,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <AuthProvider>
-          <DataProvider>
-            <AppShell>
-              {children}
-            </AppShell>
-          </DataProvider>
+          <ToastProvider>
+            <DataProvider>
+              <AppShell>
+                {children}
+              </AppShell>
+            </DataProvider>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

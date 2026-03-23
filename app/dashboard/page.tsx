@@ -69,7 +69,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
           <div className="flex justify-between items-start"><p className="text-slate-400 font-black uppercase text-[9px] tracking-[0.2em]">Ticket Médio</p><Target className="text-amber-500" size={20} /></div>
-          <h2 className="text-2xl font-black text-slate-900 dark:text-white italic mt-4">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white italic mt-4">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
         </div>
         <div className="bg-blue-600 p-6 rounded-[32px] shadow-lg shadow-blue-500/20 relative overflow-hidden">
           <div className="flex justify-between items-start text-white/70"><p className="font-black uppercase text-[9px] tracking-[0.2em]">Saldo Caixa</p><Wallet className="text-white" size={20} /></div>

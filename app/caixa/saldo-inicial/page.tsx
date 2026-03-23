@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Coins, Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "../../components/Toast";
 
 export default function SaldoInicialPage() {
+  const toast = useToast();
   const [valor, setValor] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,7 +19,7 @@ export default function SaldoInicialPage() {
     });
 
     if (response.ok) {
-      alert("Caixa aberto com sucesso!");
+      toast.success("Caixa aberto com sucesso!");
       // Redireciona para o dashboard
       window.location.href = "/dashboard";
     }

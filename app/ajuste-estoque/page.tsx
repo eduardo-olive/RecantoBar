@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, Save, Package, RotateCcw, ClipboardCheck } from "lucide-react";
+import { useToast } from "../components/Toast";
 
 interface Ajuste {
   novoEstoque?: number;
@@ -10,6 +11,7 @@ interface Ajuste {
 }
 
 export default function AjusteEstoquePage() {
+  const toast = useToast();
   const [produtos, setProdutos] = useState<any[]>([]);
   const [busca, setBusca] = useState("");
   const [ajustes, setAjustes] = useState<Record<string, Ajuste>>({});
@@ -68,10 +70,10 @@ export default function AjusteEstoquePage() {
     if (res.ok) {
       setAjustes({});
       carregar();
-      alert(`${lista.length} produto(s) atualizado(s)!`);
+      toast.success(`${lista.length} produto(s) atualizado(s)!`);
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
     setSalvando(false);
   };

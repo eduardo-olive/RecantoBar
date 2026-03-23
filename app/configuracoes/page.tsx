@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Settings, Plus, CheckCircle2, Trash2, Shield } from "lucide-react";
+import { useToast } from "../components/Toast";
 
 const TODAS_PERMISSOES = [
   { key: "vendas", label: "Vendas (PDV)" },
@@ -14,6 +15,7 @@ const TODAS_PERMISSOES = [
 ];
 
 export default function ConfiguracoesPage() {
+  const toast = useToast();
   const [perfis, setPerfis] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -41,7 +43,7 @@ export default function ConfiguracoesPage() {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nome || permissoes.length === 0) { alert("Nome e pelo menos uma permissão!"); return; }
+    if (!nome || permissoes.length === 0) { toast.warning("Nome e pelo menos uma permissão!"); return; }
 
     const url = editId ? `/api/perfis/${editId}` : "/api/perfis";
     const method = editId ? "PUT" : "POST";
@@ -52,8 +54,8 @@ export default function ConfiguracoesPage() {
       body: JSON.stringify({ nome, permissoes }),
     });
 
-    if (res.ok) { limparForm(); carregar(); }
-    else { const err = await res.json(); alert(err.error); }
+    if (res.ok) { limparForm(); carregar(); toast.success("Perfil salvo!"); }
+    else { const err = await res.json(); toast.error(err.error); }
   };
 
   const editar = (p: any) => {
@@ -63,8 +65,8 @@ export default function ConfiguracoesPage() {
   const excluir = async (id: string) => {
     if (!confirm("Excluir este perfil?")) return;
     const res = await fetch(`/api/perfis/${id}`, { method: "DELETE" });
-    if (res.ok) carregar();
-    else { const err = await res.json(); alert(err.error); }
+    if (res.ok) { carregar(); toast.success("Perfil excluído!"); }
+    else { const err = await res.json(); toast.error(err.error); }
   };
 
   if (loading) {

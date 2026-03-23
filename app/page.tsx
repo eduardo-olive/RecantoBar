@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import {
   Search, Plus, Minus, Trash2, CheckCircle2, ShoppingCart, Package, MapPin, X, ClipboardList, Send
 } from 'lucide-react';
+import { useToast } from './components/Toast';
 
 export default function VendasPDV() {
+  const toast = useToast();
   const [produtos, setProdutos] = useState<any[]>([]);
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState<any[]>([]);
@@ -76,7 +78,7 @@ export default function VendasPDV() {
       const qtdNoCarrinho = itemExistente ? itemExistente.qtd : 0;
 
       if (qtdNoCarrinho + quantidadeTemp > produtoEmSelecao.estoque) {
-        alert("Quantidade excede o estoque!");
+        toast.warning("Quantidade excede o estoque!");
         return;
       }
 
@@ -124,7 +126,7 @@ export default function VendasPDV() {
             comandaId = novaComanda.id;
           } else {
             const err = await resComanda.json();
-            alert(err.error || "Erro ao abrir comanda.");
+            toast.error(err.error || "Erro ao abrir comanda.");
             setLoading(false);
             return;
           }
@@ -152,14 +154,14 @@ export default function VendasPDV() {
         carregarMesas();
 
         if (modoMesa) {
-          alert("Pedido enviado para a mesa!");
+          toast.success("Pedido enviado para a mesa!");
         } else {
           setMetodoPagamento("PIX");
-          alert("Venda finalizada!");
+          toast.success("Venda finalizada!");
         }
       } else {
         const err = await res.json();
-        alert(err.error || "Erro ao processar.");
+        toast.error(err.error || "Erro ao processar.");
       }
     } catch (err) {
       console.error(err);

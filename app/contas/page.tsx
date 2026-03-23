@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { CreditCard, Plus, CheckCircle2, XCircle, Clock, AlertTriangle } from "lucide-react";
+import { useToast } from "../components/Toast";
 
 const CATEGORIAS_CONTA = [
   "ALUGUEL", "FORNECEDOR", "SERVICOS", "IMPOSTOS", "SALARIOS",
@@ -9,6 +10,7 @@ const CATEGORIAS_CONTA = [
 ];
 
 export default function ContasPage() {
+  const toast = useToast();
   const [dados, setDados] = useState<any>({ contas: [], resumo: { totalPagar: 0, totalReceber: 0 } });
   const [filtroTipo, setFiltroTipo] = useState<"" | "PAGAR" | "RECEBER">("");
   const [filtroStatus, setFiltroStatus] = useState<"" | "PENDENTE" | "PAGO" | "CANCELADO">("");
@@ -37,7 +39,7 @@ export default function ContasPage() {
 
   const criarConta = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!descricao || !valor || !dataVencimento) { alert("Preencha todos os campos!"); return; }
+    if (!descricao || !valor || !dataVencimento) { toast.warning("Preencha todos os campos!"); return; }
 
     const res = await fetch("/api/contas", {
       method: "POST",
@@ -49,18 +51,18 @@ export default function ContasPage() {
       setShowForm(false);
       setDescricao(""); setValor(""); setDataVencimento(""); setCategoria("OUTROS");
       carregar();
-      alert("Conta criada!");
+      toast.success("Conta criada!");
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
   };
 
   const pagarConta = async (id: string) => {
     if (!confirm("Confirma o pagamento desta conta?")) return;
     const res = await fetch(`/api/contas/${id}/pagar`, { method: "POST" });
-    if (res.ok) { carregar(); alert("Conta paga!"); }
-    else { const err = await res.json(); alert(err.error); }
+    if (res.ok) { carregar(); toast.success("Conta paga!"); }
+    else { const err = await res.json(); toast.error(err.error); }
   };
 
   const cancelarConta = async (id: string) => {

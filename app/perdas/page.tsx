@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { AlertTriangle, History } from "lucide-react";
+import { useToast } from "../components/Toast";
 
 export default function PerdasPage() {
+  const toast = useToast();
   const [produtos, setProdutos] = useState<any[]>([]);
   const [perdas, setPerdas] = useState<any[]>([]);
   const [produtoId, setProdutoId] = useState("");
@@ -25,7 +27,7 @@ export default function PerdasPage() {
   const handleConfirmarPerda = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!produtoId || !quantidade) {
-      alert("Selecione um produto e a quantidade!");
+      toast.warning("Selecione um produto e a quantidade!");
       return;
     }
 
@@ -42,10 +44,10 @@ export default function PerdasPage() {
       setQuantidade("");
       setMotivo("VENCIMENTO");
       carregar();
-      alert(`Perda registrada! Valor financeiro: R$ ${data.valorPerda.toFixed(2)}`);
+      toast.success(`Perda registrada! Valor: R$ ${data.valorPerda.toFixed(2)}`);
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
     setLoading(false);
   };

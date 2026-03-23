@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Receipt, Plus, History } from "lucide-react";
+import { useToast } from "../components/Toast";
 
 const SUBCATEGORIAS = [
   "ALUGUEL", "LUZ", "AGUA", "INTERNET", "SALARIOS",
@@ -9,6 +10,7 @@ const SUBCATEGORIAS = [
 ];
 
 export default function DespesasPage() {
+  const toast = useToast();
   const [despesas, setDespesas] = useState<any[]>([]);
   const [valor, setValor] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -24,7 +26,7 @@ export default function DespesasPage() {
 
   const registrar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!valor || !descricao) { alert("Preencha todos os campos!"); return; }
+    if (!valor || !descricao) { toast.warning("Preencha todos os campos!"); return; }
     setLoading(true);
 
     const res = await fetch("/api/movimentacoes/despesa", {
@@ -36,10 +38,10 @@ export default function DespesasPage() {
     if (res.ok) {
       setValor(""); setDescricao(""); setSubcategoria("OUTROS");
       carregar();
-      alert("Despesa registrada!");
+      toast.success("Despesa registrada!");
     } else {
       const err = await res.json();
-      alert(err.error);
+      toast.error(err.error);
     }
     setLoading(false);
   };

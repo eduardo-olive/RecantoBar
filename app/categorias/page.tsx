@@ -2,8 +2,10 @@
 
 import { Tag, Trash2, FolderPlus, Inbox } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useToast } from '../components/Toast';
 
 export default function CategoriasPage() {
+  const toast = useToast();
   const [categorias, setCategorias] = useState<any[]>([]);
   const [novaCategoria, setNovaCategoria] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function CategoriasPage() {
         carregarCategorias(); // Recarrega a lista do banco
       }
     } catch (err) {
-      alert("Erro ao salvar categoria no banco.");
+      toast.error("Erro ao salvar categoria.");
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,7 @@ export default function CategoriasPage() {
       await fetch(`/api/categorias/${id}`, { method: 'DELETE' });
       carregarCategorias();
     } catch (err) {
-      alert("Erro ao excluir.");
+      toast.error("Erro ao excluir.");
     }
   };
 

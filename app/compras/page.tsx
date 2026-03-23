@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { 
-  Search, Plus, Minus, Trash2, Package, ArrowUpCircle, Inbox 
+import {
+  Search, Plus, Minus, Trash2, Package, ArrowUpCircle, Inbox
 } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 export default function EntradaCompras() {
+  const toast = useToast();
   // --- ESTADOS DE DADOS ---
   const [produtos, setProdutos] = useState<any[]>([]);
   const [busca, setBusca] = useState("");
@@ -47,7 +49,7 @@ export default function EntradaCompras() {
       }]);
       fecharModal();
     } else {
-      alert("Informe os valores de custo e venda!");
+      toast.warning("Informe os valores de custo e venda!");
     }
   };
 
@@ -72,14 +74,14 @@ export default function EntradaCompras() {
 
       if (response.ok) {
         setCarrinho([]);
-        alert("✅ ESTOQUE E PREÇOS ATUALIZADOS NO BANCO!");
+        toast.success("Estoque e preços atualizados!");
         carregarProdutos(); // Atualiza os saldos na lista de busca
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "Erro na API");
       }
     } catch (err: any) {
-      alert(`❌ Erro: ${err.message}`);
+      toast.error(`Erro: ${err.message}`);
     } finally {
       setLoading(false);
     }

@@ -13,8 +13,10 @@ import {
   Search 
 } from 'lucide-react'; 
 import { useState, useEffect } from 'react';
+import { useToast } from '../components/Toast';
 
 export default function ProdutosPage() {
+  const toast = useToast();
   const [produtos, setProdutos] = useState<any[]>([]);
   const [categorias, setCategorias] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -82,10 +84,10 @@ export default function ProdutosPage() {
     if (!confirm(`DESEJA REALMENTE EXCLUIR O PRODUTO: ${nome}?`)) return;
     try {
       const response = await fetch(`/api/produtos/${id}`, { method: 'DELETE' });
-      if (response.ok) carregarDados();
-      else alert("Erro ao excluir produto.");
+      if (response.ok) { carregarDados(); toast.success("Produto excluído!"); }
+      else toast.error("Erro ao excluir produto.");
     } catch (err) {
-      alert("Erro na comunicação com o servidor.");
+      toast.error("Erro na comunicação com o servidor.");
     }
   };
 
@@ -115,10 +117,10 @@ export default function ProdutosPage() {
         carregarDados();
       } else {
         const erro = await response.json();
-        alert(erro.error || "Erro na operação.");
+        toast.error(erro.error || "Erro na operação.");
       }
     } catch (err) {
-      alert("Erro ao processar produto.");
+      toast.error("Erro ao processar produto.");
     } finally {
       setLoading(false);
     }
