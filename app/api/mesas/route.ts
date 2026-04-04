@@ -21,6 +21,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Número da mesa é obrigatório" }, { status: 400 });
     }
 
+    // Verificar se existe mesa desativada com o mesmo número
+    const mesaExistente = await prisma.mesa.findUnique({
+      where: { numero: Number(numero) },
+    });
+
+    if (mesaExistente && !mesaExistente.ativa) {
+      // Reativar mesa existente
+      const mesaReativada = await prisma.mesa.update({
+        where: { id: mesaExistente.id },
+        data: {
+          nome: nome || null,
+          capacidade: capacidade ? Number(capacidade) : 4,
+          status: "LIVRE",
+          ativa: true,
+        },
+      });
+      return NextResponse.json(mesaReativada, { status: 201 });
+    }
+
     const mesa = await prisma.mesa.create({
       data: {
         numero: Number(numero),
