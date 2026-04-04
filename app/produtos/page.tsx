@@ -11,10 +11,13 @@ import {
   Pencil,
   X,
   Search,
-  ChefHat
-} from 'lucide-react'; 
+  ChefHat,
+  Printer
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from '../components/Toast';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function ProdutosPage() {
   const toast = useToast();
@@ -94,6 +97,97 @@ export default function ProdutosPage() {
     }
   };
 
+  const imprimirConferencia = () => {
+    if (produtos.length === 0) {
+      toast.warning("Nenhum produto para imprimir.");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const dataAtual = new Date().toLocaleDateString("pt-BR", {
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
+
+    // Header
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("RECANTO BAR", 14, 15);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Lista de Produtos para Conferência — ${dataAtual}`, 14, 22);
+
+    // Agrupar por categoria
+    const porCategoria: Record<string, any[]> = {};
+    produtos.forEach((prod) => {
+      const cat = prod.categoria?.nome || "SEM CATEGORIA";
+      if (!porCategoria[cat]) porCategoria[cat] = [];
+      porCategoria[cat].push(prod);
+    });
+
+    // Ordenar categorias e produtos
+    const categoriasOrdenadas = Object.keys(porCategoria).sort((a, b) => a.localeCompare(b));
+    categoriasOrdenadas.forEach((cat) => {
+      porCategoria[cat].sort((a: any, b: any) => a.nome.localeCompare(b.nome));
+    });
+
+    let startY = 28;
+
+    categoriasOrdenadas.forEach((cat) => {
+      const prods = porCategoria[cat];
+
+      autoTable(doc, {
+        startY,
+        head: [[{ content: cat, colSpan: 5, styles: { fillColor: [30, 30, 30], fontSize: 9, fontStyle: "bold" } }]],
+        body: prods.map((p: any) => [
+          p.nome,
+          `R$ ${(p.precoVenda || 0).toFixed(2)}`,
+          `R$ ${(p.precoCusto || 0).toFixed(2)}`,
+          `${p.estoque || 0}`,
+          `${p.estoqueMinimo || 0} / ${p.estoqueSeguro || 0}`,
+        ]),
+        columns: [
+          { header: "Produto", dataKey: "0" },
+          { header: "Preço Venda", dataKey: "1" },
+          { header: "Preço Custo", dataKey: "2" },
+          { header: "Estoque", dataKey: "3" },
+          { header: "Mín / Máx", dataKey: "4" },
+        ],
+        headStyles: { fillColor: [30, 30, 30], fontSize: 9 },
+        bodyStyles: { fontSize: 8 },
+        columnStyles: {
+          0: { cellWidth: "auto" },
+          1: { halign: "right", cellWidth: 28 },
+          2: { halign: "right", cellWidth: 28 },
+          3: { halign: "center", cellWidth: 22 },
+          4: { halign: "center", cellWidth: 28 },
+        },
+        theme: "grid",
+        margin: { left: 14, right: 14 },
+        didParseCell: (data: any) => {
+          if (data.section === "body" && data.column.index === 3) {
+            const estoque = prods[data.row.index]?.estoque || 0;
+            const min = prods[data.row.index]?.estoqueMinimo || 0;
+            if (estoque <= min) {
+              data.cell.styles.textColor = [220, 38, 38];
+              data.cell.styles.fontStyle = "bold";
+            }
+          }
+        },
+      });
+
+      startY = (doc as any).lastAutoTable.finalY + 4;
+    });
+
+    // Rodapé com total
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.text(`Total: ${produtos.length} produtos em ${categoriasOrdenadas.length} categorias`, 14, startY + 4);
+
+    doc.save(`produtos-conferencia-${new Date().toISOString().slice(0, 10)}.pdf`);
+    toast.success("PDF gerado com sucesso!");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novoProduto.nome || !novoProduto.categoriaId || loading) return;
@@ -132,11 +226,19 @@ export default function ProdutosPage() {
 
   return (
     <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-emerald-500 pl-6 py-2">
-        <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
-          {editandoId ? "Editar Produto" : "Produtos"}
-        </h1>
-        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Gestão de Inventário e Metas</p>
+      <header className="border-l-4 border-emerald-500 pl-6 py-2 flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
+            {editandoId ? "Editar Produto" : "Produtos"}
+          </h1>
+          <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Gestão de Inventário e Metas</p>
+        </div>
+        <button
+          onClick={imprimirConferencia}
+          className="bg-slate-700 hover:bg-slate-800 text-white px-5 py-3 rounded-xl font-black uppercase text-xs tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-slate-500/20"
+        >
+          <Printer size={16} /> Imprimir Lista
+        </button>
       </header>
 
       {/* FORMULÁRIO DE CADASTRO/EDIÇÃO */}
