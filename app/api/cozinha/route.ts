@@ -2,11 +2,21 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET — itens pendentes/preparando/prontos para a cozinha
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const incluirEntregues = searchParams.get("entregues") === "true";
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const statusFiltro = ["PENDENTE", "PREPARANDO", "PRONTO"];
+    if (incluirEntregues) statusFiltro.push("ENTREGUE");
+
     const itens = await prisma.pedidoItem.findMany({
       where: {
-        status: { in: ["PENDENTE", "PREPARANDO", "PRONTO"] },
+        status: { in: statusFiltro },
+        ...(incluirEntregues && { criadoEm: { gte: hoje } }),
       },
       include: {
         produto: { select: { nome: true } },

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Clock, ChefHat, CheckCircle2, Truck, RefreshCw } from "lucide-react";
+import { Clock, ChefHat, CheckCircle2, Truck, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 
 interface ItemCozinha {
   id: string;
@@ -18,11 +18,24 @@ export default function CozinhaPage() {
   const [itens, setItens] = useState<ItemCozinha[]>([]);
   const [loading, setLoading] = useState(true);
   const [atualizando, setAtualizando] = useState<string | null>(null);
+  const [showEntregues, setShowEntregues] = useState(false);
+  const [entregues, setEntregues] = useState<ItemCozinha[]>([]);
 
   const carregar = useCallback(async () => {
     const res = await fetch("/api/cozinha");
-    if (res.ok) setItens(await res.json());
+    if (res.ok) {
+      const todos = await res.json();
+      setItens(todos);
+    }
     setLoading(false);
+  }, []);
+
+  const carregarEntregues = useCallback(async () => {
+    const res = await fetch("/api/cozinha?entregues=true");
+    if (res.ok) {
+      const todos: ItemCozinha[] = await res.json();
+      setEntregues(todos.filter((i) => i.status === "ENTREGUE"));
+    }
   }, []);
 
   useEffect(() => {
@@ -58,9 +71,22 @@ export default function CozinhaPage() {
     return acc;
   }, {});
 
+  const toggleEntregues = () => {
+    const novo = !showEntregues;
+    setShowEntregues(novo);
+    if (novo) carregarEntregues();
+  };
+
   const pendentes = itens.filter((i) => i.status === "PENDENTE");
   const preparando = itens.filter((i) => i.status === "PREPARANDO");
   const prontos = itens.filter((i) => i.status === "PRONTO");
+
+  const entreguesPorMesa = entregues.reduce<Record<string, ItemCozinha[]>>((acc, item) => {
+    const key = item.mesaNumero ? `Mesa ${item.mesaNumero}` : "Balcão";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {});
 
   if (loading) {
     return (
@@ -194,6 +220,65 @@ export default function CozinhaPage() {
           ))}
         </div>
       )}
+
+      {/* SEÇÃO DE ENTREGUES */}
+      <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+        <button
+          onClick={toggleEntregues}
+          className="w-full flex items-center justify-between bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-5 py-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Truck size={16} className="text-blue-500" />
+            <span className="font-black uppercase italic text-sm text-slate-600 dark:text-slate-300 tracking-tighter">Entregues Hoje</span>
+            {entregues.length > 0 && (
+              <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-0.5 rounded-full text-[9px] font-black">
+                {entregues.length}
+              </span>
+            )}
+          </div>
+          {showEntregues ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+        </button>
+
+        {showEntregues && (
+          <div className="mt-4">
+            {entregues.length === 0 ? (
+              <p className="text-center text-slate-400 font-bold uppercase text-xs py-8">Nenhum item entregue hoje</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {Object.entries(entreguesPorMesa).map(([mesa, mesaItens]) => (
+                  <div
+                    key={mesa}
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] overflow-hidden shadow-sm opacity-70"
+                  >
+                    <div className="bg-slate-50 dark:bg-slate-950 px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                      <h3 className="font-black uppercase italic text-sm text-slate-800 dark:text-white tracking-tighter">{mesa}</h3>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                        {mesaItens.length} ite{mesaItens.length !== 1 ? "ns" : "m"}
+                      </span>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      {mesaItens.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900"
+                        >
+                          <span className="font-black text-sm uppercase italic text-slate-600 dark:text-slate-300">
+                            {item.quantidade}x {item.produto.nome}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400">{tempoDecorrido(item.criadoEm)}</span>
+                            <span className="bg-blue-500 text-white px-2 py-0.5 rounded-full text-[8px] font-black uppercase">Entregue</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
