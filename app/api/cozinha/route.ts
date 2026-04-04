@@ -7,8 +7,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const incluirEntregues = searchParams.get("entregues") === "true";
 
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    // Meia-noite no horário de Brasília (UTC-3)
+    const agora = new Date();
+    const hojeBrasilia = new Date(agora.getTime() - 3 * 60 * 60 * 1000);
+    hojeBrasilia.setUTCHours(0, 0, 0, 0);
+    const inicioHoje = new Date(hojeBrasilia.getTime() + 3 * 60 * 60 * 1000);
 
     const statusFiltro = ["PENDENTE", "PREPARANDO", "PRONTO"];
     if (incluirEntregues) statusFiltro.push("ENTREGUE");
@@ -16,7 +19,7 @@ export async function GET(request: Request) {
     const itens = await prisma.pedidoItem.findMany({
       where: {
         status: { in: statusFiltro },
-        ...(incluirEntregues && { criadoEm: { gte: hoje } }),
+        ...(incluirEntregues && { criadoEm: { gte: inicioHoje } }),
       },
       include: {
         produto: { select: { nome: true } },
