@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit3, Trash2, Users, X, Save, Eye, ClipboardList, CreditCard, Banknote } from "lucide-react";
+import { Plus, Edit3, Trash2, Users, X, Save, Eye, ClipboardList, CreditCard, Banknote, Layers } from "lucide-react";
 import { useToast } from "../components/Toast";
 
 interface Mesa {
@@ -68,6 +68,10 @@ export default function MesasPage() {
   const [pagamentos, setPagamentos] = useState<Pagamento[]>([{ valor: "", metodoPagamento: "DINHEIRO" }]);
   const [processando, setProcessando] = useState(false);
 
+  // Criar em lote
+  const [showLote, setShowLote] = useState(false);
+  const [loteForm, setLoteForm] = useState({ de: "", ate: "", capacidade: "4" });
+
   const carregar = async () => {
     setLoading(true);
     const res = await fetch("/api/mesas");
@@ -127,6 +131,36 @@ export default function MesasPage() {
       body: JSON.stringify({ status: "LIVRE" }),
     });
     if (res.ok) carregar();
+  };
+
+  const criarEmLote = async () => {
+    const de = Number(loteForm.de);
+    const ate = Number(loteForm.ate);
+
+    if (!de || !ate || de > ate) {
+      toast.warning("Informe um intervalo válido (De deve ser menor ou igual a Até)");
+      return;
+    }
+
+    const res = await fetch("/api/mesas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lote: { de, ate },
+        capacidade: Number(loteForm.capacidade) || 4,
+      }),
+    });
+
+    if (res.ok) {
+      const result = await res.json();
+      toast.success(`${result.criadas} mesa(s) criada(s)${result.ignoradas > 0 ? `, ${result.ignoradas} já existia(m)` : ""}`);
+      setShowLote(false);
+      setLoteForm({ de: "", ate: "", capacidade: "4" });
+      carregar();
+    } else {
+      const err = await res.json();
+      toast.error(err.error);
+    }
   };
 
   const editar = (mesa: Mesa) => {
@@ -244,12 +278,20 @@ export default function MesasPage() {
           <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Mesas</h1>
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Controle de mesas do estabelecimento</p>
         </div>
-        <button
-          onClick={() => { setEditando(null); setForm({ numero: "", nome: "", capacidade: "4" }); setShowForm(true); }}
-          className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl font-black uppercase text-xs tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-orange-500/20"
-        >
-          <Plus size={16} /> Nova Mesa
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setShowLote(true); setLoteForm({ de: "", ate: "", capacidade: "4" }); }}
+            className="bg-slate-700 hover:bg-slate-800 text-white px-5 py-3 rounded-xl font-black uppercase text-xs tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-slate-500/20"
+          >
+            <Layers size={16} /> Criar Várias
+          </button>
+          <button
+            onClick={() => { setEditando(null); setForm({ numero: "", nome: "", capacidade: "4" }); setShowForm(true); }}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl font-black uppercase text-xs tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-orange-500/20"
+          >
+            <Plus size={16} /> Nova Mesa
+          </button>
+        </div>
       </header>
 
       {/* GRID DE MESAS */}
@@ -608,6 +650,53 @@ export default function MesasPage() {
               className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all shadow-lg"
             >
               <CreditCard size={16} /> {processando ? "Processando..." : "Confirmar Pagamento"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CRIAR VÁRIAS MESAS */}
+      {showLote && (
+        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[380px] rounded-[35px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black uppercase italic dark:text-white">Criar Várias Mesas</h2>
+              <button onClick={() => setShowLote(false)} className="text-slate-400 hover:text-rose-500"><X size={20} /></button>
+            </div>
+
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
+              Informe o intervalo de números das mesas. Mesas já existentes serão ignoradas.
+            </p>
+
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">De *</label>
+                  <input type="number" min="1" value={loteForm.de} onChange={(e) => setLoteForm({ ...loteForm, de: e.target.value })}
+                    className="w-full mt-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-xl font-black text-lg text-center outline-none focus:ring-2 ring-orange-500/20" placeholder="1" />
+                </div>
+                <div className="flex-1">
+                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Até *</label>
+                  <input type="number" min="1" value={loteForm.ate} onChange={(e) => setLoteForm({ ...loteForm, ate: e.target.value })}
+                    className="w-full mt-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-xl font-black text-lg text-center outline-none focus:ring-2 ring-orange-500/20" placeholder="20" />
+                </div>
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Capacidade (todas)</label>
+                <input type="number" min="1" value={loteForm.capacidade} onChange={(e) => setLoteForm({ ...loteForm, capacidade: e.target.value })}
+                  className="w-full mt-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-xl font-bold text-sm text-center outline-none focus:ring-2 ring-orange-500/20" />
+              </div>
+            </div>
+
+            {loteForm.de && loteForm.ate && Number(loteForm.ate) >= Number(loteForm.de) && (
+              <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest mt-3">
+                {Number(loteForm.ate) - Number(loteForm.de) + 1} mesa(s) serão criadas
+              </p>
+            )}
+
+            <button onClick={criarEmLote} disabled={!loteForm.de || !loteForm.ate}
+              className="w-full mt-6 bg-slate-700 hover:bg-slate-800 disabled:opacity-30 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all shadow-lg">
+              <Layers size={16} /> Criar Mesas
             </button>
           </div>
         </div>

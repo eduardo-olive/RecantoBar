@@ -15,8 +15,56 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { numero, nome, capacidade } = await request.json();
+    const { numero, nome, capacidade, lote } = await request.json();
 
+    // Criação em lote: { lote: { de: 1, ate: 20 }, capacidade: 4 }
+    if (lote) {
+      const de = Number(lote.de);
+      const ate = Number(lote.ate);
+
+      if (!de || !ate || de > ate) {
+        return NextResponse.json({ error: "Intervalo inválido" }, { status: 400 });
+      }
+
+      if (ate - de + 1 > 100) {
+        return NextResponse.json({ error: "Máximo de 100 mesas por vez" }, { status: 400 });
+      }
+
+      const criadas: number[] = [];
+      const ignoradas: number[] = [];
+
+      for (let n = de; n <= ate; n++) {
+        const existente = await prisma.mesa.findUnique({ where: { numero: n } });
+
+        if (existente && existente.ativa) {
+          ignoradas.push(n);
+          continue;
+        }
+
+        if (existente && !existente.ativa) {
+          await prisma.mesa.update({
+            where: { id: existente.id },
+            data: {
+              capacidade: capacidade ? Number(capacidade) : 4,
+              status: "LIVRE",
+              ativa: true,
+            },
+          });
+        } else {
+          await prisma.mesa.create({
+            data: { numero: n, capacidade: capacidade ? Number(capacidade) : 4 },
+          });
+        }
+        criadas.push(n);
+      }
+
+      return NextResponse.json(
+        { criadas: criadas.length, ignoradas: ignoradas.length },
+        { status: 201 }
+      );
+    }
+
+    // Criação individual
     if (!numero) {
       return NextResponse.json({ error: "Número da mesa é obrigatório" }, { status: 400 });
     }
@@ -27,7 +75,6 @@ export async function POST(request: Request) {
     });
 
     if (mesaExistente && !mesaExistente.ativa) {
-      // Reativar mesa existente
       const mesaReativada = await prisma.mesa.update({
         where: { id: mesaExistente.id },
         data: {
