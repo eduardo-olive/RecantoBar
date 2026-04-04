@@ -65,7 +65,7 @@ export async function PUT(
         categoriaId: body.categoriaId,
         estoqueMinimo: Number(body.estoqueMinimo),
         estoqueSeguro: Number(body.estoqueSeguro),
-        // Adicione precoVenda ou outros campos se necessário
+        ...(body.requerPreparo !== undefined && { requerPreparo: body.requerPreparo })
       },
     });
 

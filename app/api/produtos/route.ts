@@ -27,7 +27,8 @@ export async function POST(request: Request) {
         estoque: parseInt(body.estoque),
         estoqueMinimo: parseInt(body.estoqueMinimo),
         estoqueSeguro: parseInt(body.estoqueSeguro),
-        categoriaId: body.categoriaId
+        categoriaId: body.categoriaId,
+        requerPreparo: body.requerPreparo ?? false
       }
     });
 

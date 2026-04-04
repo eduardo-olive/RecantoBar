@@ -1,16 +1,17 @@
 "use client";
 
-import { 
-  Plus, 
-  Tag, 
-  Box, 
-  AlertTriangle, 
-  Inbox, 
-  TrendingUp, 
-  Trash2, 
-  Pencil, 
-  X, 
-  Search 
+import {
+  Plus,
+  Tag,
+  Box,
+  AlertTriangle,
+  Inbox,
+  TrendingUp,
+  Trash2,
+  Pencil,
+  X,
+  Search,
+  ChefHat
 } from 'lucide-react'; 
 import { useState, useEffect } from 'react';
 import { useToast } from '../components/Toast';
@@ -28,8 +29,9 @@ export default function ProdutosPage() {
   const [novoProduto, setNovoProduto] = useState({
     nome: "",
     estoqueMinimo: "",
-    estoqueSeguro: "", 
-    categoriaId: "" 
+    estoqueSeguro: "",
+    categoriaId: "",
+    requerPreparo: false
   });
 
   // CARREGAR DADOS COM ORDENAÇÃO ALFABÉTICA
@@ -70,14 +72,15 @@ export default function ProdutosPage() {
       nome: prod.nome,
       estoqueMinimo: prod.estoqueMinimo.toString(),
       estoqueSeguro: prod.estoqueSeguro.toString(),
-      categoriaId: prod.categoriaId
+      categoriaId: prod.categoriaId,
+      requerPreparo: prod.requerPreparo || false
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
     setEditandoId(null);
-    setNovoProduto({ nome: "", estoqueMinimo: "", estoqueSeguro: "", categoriaId: "" });
+    setNovoProduto({ nome: "", estoqueMinimo: "", estoqueSeguro: "", categoriaId: "", requerPreparo: false });
   };
 
   const handleDelete = async (id: string, nome: string) => {
@@ -108,6 +111,7 @@ export default function ProdutosPage() {
           categoriaId: novoProduto.categoriaId,
           estoqueMinimo: Number(novoProduto.estoqueMinimo) || 0,
           estoqueSeguro: Number(novoProduto.estoqueSeguro) || 0,
+          requerPreparo: novoProduto.requerPreparo,
           ...(editandoId ? {} : { estoque: 0, precoVenda: 0, precoCusto: 0 })
         }),
       });
@@ -177,9 +181,26 @@ export default function ProdutosPage() {
               className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl text-sm font-black uppercase outline-none dark:text-white"
             />
 
+            <label
+              className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl cursor-pointer border border-transparent hover:border-amber-500 transition-all"
+              title="Produtos que precisam ser preparados na cozinha"
+            >
+              <input
+                type="checkbox"
+                checked={novoProduto.requerPreparo}
+                onChange={(e) => setNovoProduto({...novoProduto, requerPreparo: e.target.checked})}
+                className="sr-only peer"
+              />
+              <div className={`w-10 h-5 rounded-full transition-all relative ${novoProduto.requerPreparo ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-700'}`}>
+                <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${novoProduto.requerPreparo ? 'left-5' : 'left-0.5'}`} />
+              </div>
+              <ChefHat size={16} className={novoProduto.requerPreparo ? 'text-amber-500' : 'text-slate-400'} />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Preparo Cozinha</span>
+            </label>
+
             <div className="flex gap-2">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
                 className={`flex-1 ${editandoId ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500'} text-white p-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50`}
               >
@@ -243,7 +264,10 @@ export default function ProdutosPage() {
                 return (
                   <tr key={prod.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
                     <td className="p-6">
-                      <p className="font-black text-slate-800 dark:text-white uppercase text-sm italic">{prod.nome}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-black text-slate-800 dark:text-white uppercase text-sm italic">{prod.nome}</p>
+                        {prod.requerPreparo && <span title="Requer preparo na cozinha"><ChefHat size={14} className="text-amber-500" /></span>}
+                      </div>
                     </td>
                     <td className="p-6">
                       <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-[10px] font-black text-slate-500 uppercase">
