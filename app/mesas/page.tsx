@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit3, Trash2, Users, X, Save, Eye, ClipboardList, CreditCard, Banknote, Layers } from "lucide-react";
+import { Plus, Edit3, Trash2, Users, X, Save, Eye, ClipboardList, CreditCard, Banknote, Layers, XCircle } from "lucide-react";
 import { useToast } from "../components/Toast";
 
 interface Mesa {
@@ -252,6 +252,23 @@ export default function MesasPage() {
       toast.error(err.error);
     }
     setProcessando(false);
+  };
+
+  const cancelarItem = async (itemId: string, nomeProduto: string) => {
+    if (!confirm(`Cancelar "${nomeProduto}" da comanda? O estoque será devolvido.`)) return;
+    const res = await fetch(`/api/pedido-itens/${itemId}`, { method: "DELETE" });
+    if (res.ok) {
+      toast.success("Item cancelado!");
+      // Recarregar detalhes da comanda
+      if (comandaDetalhes) {
+        const r = await fetch(`/api/comandas/${comandaDetalhes.id}`);
+        if (r.ok) setComandaDetalhes(await r.json());
+      }
+      carregar();
+    } else {
+      const err = await res.json();
+      toast.error(err.error || "Erro ao cancelar item");
+    }
   };
 
   const cancelarComanda = async (comanda: Comanda) => {
@@ -527,6 +544,15 @@ export default function MesasPage() {
                             }`}>
                               {item.status}
                             </span>
+                            {!pedido.pago && item.status !== "PREPARANDO" && (
+                              <button
+                                onClick={() => cancelarItem(item.id, item.produto.nome)}
+                                className="text-slate-300 hover:text-rose-500 transition-colors"
+                                title="Cancelar item"
+                              >
+                                <XCircle size={14} />
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}

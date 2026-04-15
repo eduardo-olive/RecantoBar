@@ -8,7 +8,7 @@ import {
   LayoutDashboard, ShoppingCart, Package, Tags,
   AlertTriangle, FileText, Truck, Moon, Sun,
   ClipboardList, ChevronDown, Banknote, Coins, Wallet,
-  Receipt, BarChart3, CreditCard, TrendingUp,
+  Receipt, BarChart3, CreditCard, TrendingUp, ArrowRightLeft,
   Users, Settings, LogOut, User, ClipboardCheck, Grid3X3, UtensilsCrossed,
   BookOpen
 } from "lucide-react";
@@ -45,6 +45,7 @@ export function Sidebar() {
         { name: "Vendas (PDV)", path: "/", icon: ShoppingCart },
         { name: "Mesas", path: "/mesas", icon: Grid3X3 },
         { name: "Cozinha", path: "/cozinha", icon: UtensilsCrossed },
+        { name: "Trocas", path: "/trocas", icon: ArrowRightLeft },
         { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
       ]
     },

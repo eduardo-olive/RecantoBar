@@ -26,6 +26,8 @@ model Produto {
   requerPreparo Boolean  @default(false)
   perdas        Perda[]
   pedidoItens   PedidoItem[]
+  trocasOriginal Troca[] @relation("TrocaProdutoOriginal")
+  trocasNovo     Troca[] @relation("TrocaProdutoNovo")
   createdAt     DateTime @default(now())
 }
 
@@ -44,6 +46,8 @@ model Movimentacao {
   conta        ContaPagarReceber?
   pedido       Pedido?        @relation("PedidoMovimentacao")
   comandaPgto  ComandaPagamento?
+  trocaEstorno Troca?         @relation("TrocaEstorno")
+  trocaNova    Troca?         @relation("TrocaNova")
 }
 
 model Perda {
@@ -68,6 +72,7 @@ model Caixa {
   observacao      String?
   status          String         @default("aberto")
   movimentacoes   Movimentacao[]
+  trocas          Troca[]
 }
 
 model Usuario {
@@ -144,6 +149,7 @@ model PedidoItem {
   mesaNumero  Int?
   criadoEm    DateTime @default(now())
   atualizadoEm DateTime @updatedAt
+  trocas      Troca[]  @relation("TrocaOriginal")
 }
 
 model ComandaPagamento {
@@ -155,6 +161,31 @@ model ComandaPagamento {
   movimentacaoId  String?       @unique
   movimentacao    Movimentacao? @relation(fields: [movimentacaoId], references: [id])
   criadoEm        DateTime      @default(now())
+}
+
+model Troca {
+  id                    String        @id @default(cuid())
+  data                  DateTime      @default(now())
+  pedidoItemOriginalId  String
+  pedidoItemOriginal    PedidoItem    @relation("TrocaOriginal", fields: [pedidoItemOriginalId], references: [id])
+  produtoOriginalId     String
+  produtoOriginal       Produto       @relation("TrocaProdutoOriginal", fields: [produtoOriginalId], references: [id])
+  qtdDevolvida          Int
+  produtoNovoId         String?
+  produtoNovo           Produto?      @relation("TrocaProdutoNovo", fields: [produtoNovoId], references: [id])
+  qtdNova               Int           @default(0)
+  valorOriginal         Float
+  valorNovo             Float         @default(0)
+  diferenca             Float         @default(0) // positivo=cobrar, negativo=devolver/crédito
+  resolucaoDiferenca    String?       // COBRADO, DEVOLVIDO, CREDITO
+  metodoPagamento       String?
+  motivo                String?
+  movEstornoId          String?       @unique
+  movEstorno            Movimentacao? @relation("TrocaEstorno", fields: [movEstornoId], references: [id])
+  movNovaId             String?       @unique
+  movNova               Movimentacao? @relation("TrocaNova", fields: [movNovaId], references: [id])
+  caixaId               Int?
+  caixa                 Caixa?        @relation(fields: [caixaId], references: [id])
 }
 
 model CategoriaDespesa {
