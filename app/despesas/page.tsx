@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Receipt, Plus, History } from "lucide-react";
+import { Receipt, Plus, History, Trash2 } from "lucide-react";
 import { useToast } from "../components/Toast";
 
 const SUBCATEGORIAS = [
@@ -16,6 +16,7 @@ export default function DespesasPage() {
   const [descricao, setDescricao] = useState("");
   const [subcategoria, setSubcategoria] = useState("OUTROS");
   const [loading, setLoading] = useState(false);
+  const [excluindo, setExcluindo] = useState<string | null>(null);
 
   const carregar = async () => {
     const res = await fetch("/api/movimentacoes?categoria=DESPESA");
@@ -44,6 +45,20 @@ export default function DespesasPage() {
       toast.error(err.error);
     }
     setLoading(false);
+  };
+
+  const excluir = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir esta despesa? O valor será devolvido ao caixa.")) return;
+    setExcluindo(id);
+    const res = await fetch(`/api/movimentacoes/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      carregar();
+      toast.success("Despesa excluída!");
+    } else {
+      const err = await res.json();
+      toast.error(err.error || "Erro ao excluir despesa");
+    }
+    setExcluindo(null);
   };
 
   const totalDespesas = despesas.reduce((acc, d) => acc + d.valor, 0);
@@ -106,6 +121,7 @@ export default function DespesasPage() {
               <th className="p-4">Categoria</th>
               <th className="p-4">Descrição</th>
               <th className="p-4 text-right">Valor</th>
+              <th className="p-4 text-center">Ação</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -115,9 +131,15 @@ export default function DespesasPage() {
                 <td className="p-4"><span className="bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-3 py-1 rounded-full text-[9px] font-black uppercase">{d.subcategoria || "OUTROS"}</span></td>
                 <td className="p-4 font-bold text-sm text-slate-700 dark:text-slate-200 uppercase italic">{d.desc}</td>
                 <td className="p-4 text-right font-black text-rose-500">R$ {d.valor.toFixed(2)}</td>
+                <td className="p-4 text-center">
+                  <button onClick={() => excluir(d.id)} disabled={excluindo === d.id}
+                    className="text-slate-400 hover:text-rose-500 transition-colors disabled:opacity-50" title="Excluir despesa">
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
-            {despesas.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-slate-400 font-bold italic">Nenhuma despesa registrada</td></tr>}
+            {despesas.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-slate-400 font-bold italic">Nenhuma despesa registrada</td></tr>}
           </tbody>
         </table>
       </section>
