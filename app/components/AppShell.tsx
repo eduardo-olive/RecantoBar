@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Sidebar } from "./Sidebar";
+import { Topbar } from "./Topbar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -29,14 +30,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <div className="w-72 h-screen fixed left-0 top-0 z-40">
+      <div className="w-64 h-screen fixed left-0 top-16 z-30">
         <Sidebar />
       </div>
-      <main className="flex-1 ml-72 min-h-screen">
-        <div className="p-8 lg:p-12 max-w-[1600px] mx-auto">
-          {children}
+      <div className="flex-1 ml-64 flex flex-col min-h-screen">
+        <div className="fixed top-0 left-0 right-0 z-40">
+          <Topbar />
         </div>
-      </main>
+        <main className="flex-1 mt-16 min-h-0">
+          <div className="p-8 lg:p-12 max-w-[1600px] mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

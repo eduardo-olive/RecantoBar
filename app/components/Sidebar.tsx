@@ -1,39 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import {
   LayoutDashboard, ShoppingCart, Package, Tags,
-  AlertTriangle, FileText, Truck, Moon, Sun,
+  AlertTriangle, FileText, Truck,
   ClipboardList, ChevronDown, Banknote, Coins, Wallet,
   Receipt, BarChart3, CreditCard, TrendingUp, ArrowRightLeft,
-  Users, Settings, LogOut, User, ClipboardCheck, Grid3X3, UtensilsCrossed,
+  Users, Settings, ClipboardCheck, Grid3X3, UtensilsCrossed,
   BookOpen
 } from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const [isDark, setIsDark] = useState(true);
-  const [mounted, setMounted] = useState(false);
   const [openGroup, setOpenGroup] = useState("operacional");
 
   const permissoes: string[] = (session?.user as any)?.permissoes || [];
   const temPermissao = (p: string) => permissoes.includes(p) || permissoes.includes("admin");
-
-  useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "light") {
-      setIsDark(false);
-      document.documentElement.classList.remove("dark");
-    } else {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
 
   const menuGroups = [
     {
@@ -96,21 +82,8 @@ export function Sidebar() {
     setOpenGroup(openGroup === id ? "" : id);
   };
 
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    document.documentElement.classList.toggle("dark");
-    localStorage.setItem("theme", newTheme ? "dark" : "light");
-  };
-
   return (
-    <aside className="w-72 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 transition-all overflow-hidden">
-      <div className="mb-8 px-2 text-center">
-        <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
-          Recanto <span className="text-blue-600">PLANALTO</span>
-        </h2>
-        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em]">Gestão Inteligente</p>
-      </div>
+    <aside className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-5 pt-6 transition-all overflow-hidden">
 
       <nav className="flex-1 space-y-3 overflow-y-auto pr-2 custom-scrollbar">
         {menuGroups.filter(g => temPermissao(g.permissao)).map((group) => (
@@ -158,41 +131,6 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* USUARIO + APARENCIA */}
-      <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
-        {/* Info do usuario */}
-        {session?.user && (
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="bg-blue-600/10 p-1.5 rounded-lg flex-shrink-0">
-                <User size={14} className="text-blue-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-black text-slate-700 dark:text-white truncate">{session.user.name}</p>
-                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{(session.user as any).perfil}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="text-slate-400 hover:text-rose-500 transition-colors p-1.5 flex-shrink-0"
-              title="Sair"
-            >
-              <LogOut size={14} />
-            </button>
-          </div>
-        )}
-
-        {/* Tema */}
-        <button onClick={toggleTheme} className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-3 text-[10px] font-black uppercase text-slate-500">
-            {mounted && (isDark ? <Sun className="text-amber-500" size={14} /> : <Moon className="text-blue-600" size={14} />)}
-            Aparência
-          </div>
-          <div className={`w-8 h-4 rounded-full relative p-1 ${isDark ? 'bg-blue-600' : 'bg-slate-300'}`}>
-            <div className={`w-2 h-2 bg-white rounded-full transition-all ${isDark ? 'translate-x-4' : 'translate-x-0'}`} />
-          </div>
-        </button>
-      </div>
     </aside>
   );
 }
