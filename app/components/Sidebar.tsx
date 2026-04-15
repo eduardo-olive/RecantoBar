@@ -13,7 +13,11 @@ import {
   BookOpen
 } from "lucide-react";
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+}
+
+export function Sidebar({ collapsed }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [openGroup, setOpenGroup] = useState("operacional");
@@ -41,7 +45,7 @@ export function Sidebar() {
       icon: Package,
       permissao: "estoque",
       items: [
-        { name: 'Entrada/Compras', path: '/compras', icon: Truck },
+        { name: "Entrada/Compras", path: "/compras", icon: Truck },
         { name: "Produtos", path: "/produtos", icon: Package },
         { name: "Categorias", path: "/categorias", icon: Tags },
         { name: "Ajuste Estoque", path: "/ajuste-estoque", icon: ClipboardCheck },
@@ -82,20 +86,55 @@ export function Sidebar() {
     setOpenGroup(openGroup === id ? "" : id);
   };
 
-  return (
-    <aside className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-5 pt-6 transition-all overflow-hidden">
+  // Verificar se algum item do grupo está ativo
+  const isGroupActive = (items: { path: string }[]) =>
+    items.some((item) => pathname === item.path);
 
-      <nav className="flex-1 space-y-3 overflow-y-auto pr-2 custom-scrollbar">
+  // === MODO COLAPSADO: só ícones ===
+  if (collapsed) {
+    return (
+      <aside className="w-16 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 gap-1 overflow-y-auto custom-scrollbar transition-all">
+        {menuGroups.filter(g => temPermissao(g.permissao)).map((group) => (
+          <div key={group.id} className="flex flex-col items-center gap-1 w-full px-2">
+            {group.items.map((item) => {
+              const isActive = pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                      : "text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  }`}
+                  title={item.name}
+                >
+                  <item.icon size={18} />
+                </Link>
+              );
+            })}
+            {/* Separador entre grupos */}
+            <div className="w-6 h-px bg-slate-200 dark:bg-slate-800 my-1" />
+          </div>
+        ))}
+      </aside>
+    );
+  }
+
+  // === MODO EXPANDIDO: completo ===
+  return (
+    <aside className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-5 pt-4 transition-all overflow-hidden">
+      <nav className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">
         {menuGroups.filter(g => temPermissao(g.permissao)).map((group) => (
           <div key={group.id} className="space-y-1">
             <button
               onClick={() => toggleGroup(group.id)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+              className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all ${
                 openGroup === group.id ? "bg-slate-100 dark:bg-slate-800/50" : "hover:bg-slate-50 dark:hover:bg-slate-800/30"
               }`}
             >
               <div className="flex items-center gap-3">
-                <group.icon size={18} className={openGroup === group.id ? "text-blue-600" : "text-slate-400"} />
+                <group.icon size={18} className={openGroup === group.id || isGroupActive(group.items) ? "text-blue-600" : "text-slate-400"} />
                 <span className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">
                   {group.title}
                 </span>
@@ -130,7 +169,6 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
-
     </aside>
   );
 }

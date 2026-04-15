@@ -38,30 +38,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  const sidebarWidth = sidebarOpen ? "w-64" : "w-16";
+  const contentMargin = sidebarOpen ? "ml-64" : "ml-16";
+
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <div
-        className={`h-screen fixed left-0 top-16 z-30 transition-all duration-300 ${
-          sidebarOpen ? "w-64 translate-x-0" : "w-64 -translate-x-full"
-        }`}
-      >
-        <Sidebar />
+      <div className={`${sidebarWidth} h-screen fixed left-0 top-16 z-30 transition-all duration-300`}>
+        <Sidebar collapsed={!sidebarOpen} />
       </div>
-
-      {/* Overlay mobile */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-20 lg:hidden"
-          onClick={toggleSidebar}
-        />
-      )}
-
-      <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-          sidebarOpen ? "ml-64" : "ml-0"
-        }`}
-      >
+      <div className={`flex-1 ${contentMargin} flex flex-col min-h-screen transition-all duration-300`}>
         <div className="fixed top-0 left-0 right-0 z-40">
           <Topbar onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
         </div>
