@@ -10,14 +10,15 @@ import {
   ClipboardList, ChevronDown, Banknote, Coins, Wallet,
   Receipt, BarChart3, CreditCard, TrendingUp, ArrowRightLeft,
   Users, Settings, ClipboardCheck, Grid3X3, UtensilsCrossed,
-  BookOpen
+  BookOpen, PanelLeftClose, PanelLeftOpen
 } from "lucide-react";
 
 interface SidebarProps {
   collapsed: boolean;
+  onToggle: () => void;
 }
 
-export function Sidebar({ collapsed }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [openGroup, setOpenGroup] = useState("operacional");
@@ -93,30 +94,38 @@ export function Sidebar({ collapsed }: SidebarProps) {
   // === MODO COLAPSADO: só ícones ===
   if (collapsed) {
     return (
-      <aside className="w-16 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 gap-1 overflow-y-auto custom-scrollbar transition-all">
-        {menuGroups.filter(g => temPermissao(g.permissao)).map((group) => (
-          <div key={group.id} className="flex flex-col items-center gap-1 w-full px-2">
-            {group.items.map((item) => {
-              const isActive = pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                      : "text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                  }`}
-                  title={item.name}
-                >
-                  <item.icon size={18} />
-                </Link>
-              );
-            })}
-            {/* Separador entre grupos */}
-            <div className="w-6 h-px bg-slate-200 dark:bg-slate-800 my-1" />
-          </div>
-        ))}
+      <aside className="w-16 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 transition-all">
+        <div className="flex-1 flex flex-col items-center gap-1 overflow-y-auto custom-scrollbar w-full px-2">
+          {menuGroups.filter(g => temPermissao(g.permissao)).map((group) => (
+            <div key={group.id} className="flex flex-col items-center gap-1 w-full">
+              {group.items.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                        : "text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    }`}
+                    title={item.name}
+                  >
+                    <item.icon size={18} />
+                  </Link>
+                );
+              })}
+              <div className="w-6 h-px bg-slate-200 dark:bg-slate-800 my-1" />
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={onToggle}
+          className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all mt-2"
+          title="Expandir menu"
+        >
+          <PanelLeftOpen size={18} />
+        </button>
       </aside>
     );
   }
@@ -169,6 +178,15 @@ export function Sidebar({ collapsed }: SidebarProps) {
           </div>
         ))}
       </nav>
+      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-2">
+        <button
+          onClick={onToggle}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all"
+        >
+          <PanelLeftClose size={18} />
+          <span className="text-[10px] font-black uppercase tracking-widest">Recolher</span>
+        </button>
+      </div>
     </aside>
   );
 }

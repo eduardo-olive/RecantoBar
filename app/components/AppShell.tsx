@@ -44,11 +44,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <div className={`${sidebarWidth} h-screen fixed left-0 top-16 z-30 transition-all duration-300`}>
-        <Sidebar collapsed={!sidebarOpen} />
+        <Sidebar collapsed={!sidebarOpen} onToggle={toggleSidebar} />
       </div>
       <div className={`flex-1 ${contentMargin} flex flex-col min-h-screen transition-all duration-300`}>
         <div className="fixed top-0 left-0 right-0 z-40">
-          <Topbar onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+          <Topbar />
         </div>
         <main className="flex-1 mt-16 min-h-0">
           <div className="p-5 lg:p-7 max-w-[1600px] mx-auto">
