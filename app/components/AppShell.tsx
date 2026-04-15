@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Topbar />
         </div>
         <main className="flex-1 mt-16 min-h-0">
-          <div className="p-8 lg:p-12 max-w-[1600px] mx-auto">
+          <div className="p-5 lg:p-7 max-w-[1600px] mx-auto">
             {children}
           </div>
         </main>
