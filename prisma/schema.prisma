@@ -157,6 +157,12 @@ model ComandaPagamento {
   criadoEm        DateTime      @default(now())
 }
 
+model CategoriaDespesa {
+  id        String   @id @default(cuid())
+  nome      String   @unique
+  createdAt DateTime @default(now())
+}
+
 model ContaPagarReceber {
   id             String        @id @default(cuid())
   tipo           String        // PAGAR ou RECEBER

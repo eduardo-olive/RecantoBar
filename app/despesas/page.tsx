@@ -4,26 +4,32 @@ import { useState, useEffect } from "react";
 import { Receipt, Plus, History, Trash2 } from "lucide-react";
 import { useToast } from "../components/Toast";
 
-const SUBCATEGORIAS = [
-  "ALUGUEL", "LUZ", "AGUA", "INTERNET", "SALARIOS",
-  "FORNECEDORES", "MANUTENCAO", "LIMPEZA", "OUTROS"
-];
-
 export default function DespesasPage() {
   const toast = useToast();
   const [despesas, setDespesas] = useState<any[]>([]);
+  const [categorias, setCategorias] = useState<string[]>([]);
   const [valor, setValor] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [subcategoria, setSubcategoria] = useState("OUTROS");
+  const [subcategoria, setSubcategoria] = useState("");
   const [loading, setLoading] = useState(false);
   const [excluindo, setExcluindo] = useState<string | null>(null);
+
+  const carregarCategorias = async () => {
+    const res = await fetch("/api/categorias-despesa");
+    if (res.ok) {
+      const data = await res.json();
+      const nomes = data.map((c: any) => c.nome);
+      setCategorias(nomes);
+      if (nomes.length > 0 && !subcategoria) setSubcategoria(nomes[0]);
+    }
+  };
 
   const carregar = async () => {
     const res = await fetch("/api/movimentacoes?categoria=DESPESA");
     if (res.ok) setDespesas(await res.json());
   };
 
-  useEffect(() => { carregar(); }, []);
+  useEffect(() => { carregarCategorias(); carregar(); }, []);
 
   const registrar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +43,7 @@ export default function DespesasPage() {
     });
 
     if (res.ok) {
-      setValor(""); setDescricao(""); setSubcategoria("OUTROS");
+      setValor(""); setDescricao(""); setSubcategoria(categorias[0] || "");
       carregar();
       toast.success("Despesa registrada!");
     } else {
@@ -77,7 +83,7 @@ export default function DespesasPage() {
             <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Categoria</label>
             <select value={subcategoria} onChange={(e) => setSubcategoria(e.target.value)}
               className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3.5 rounded-xl font-bold uppercase text-sm outline-none appearance-none cursor-pointer">
-              {SUBCATEGORIAS.map(s => <option key={s} value={s}>{s}</option>)}
+              {categorias.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-2">

@@ -70,6 +70,7 @@ export function Sidebar() {
         { name: "Caixa / Fluxo", path: "/caixa", icon: Banknote },
         { name: "Abrir Caixa", path: "/caixa/saldo-inicial", icon: Coins },
         { name: "Despesas", path: "/despesas", icon: Receipt },
+        { name: "Cat. Despesas", path: "/categorias-despesa", icon: Tags },
         { name: "Contas Pagar/Receber", path: "/contas", icon: CreditCard },
         { name: "Relatórios", path: "/dashboard/relatorios", icon: FileText },
         { name: "DRE", path: "/dashboard/relatorios/dre", icon: TrendingUp },
