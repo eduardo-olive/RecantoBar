@@ -94,7 +94,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   // === MODO COLAPSADO: só ícones ===
   if (collapsed) {
     return (
-      <aside className="w-16 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 transition-all">
+      <aside className="w-16 h-[calc(100vh-4rem)] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 transition-all">
         <div className="flex-1 flex flex-col items-center gap-1 overflow-y-auto custom-scrollbar w-full px-2">
           {menuGroups.filter(g => temPermissao(g.permissao)).map((group) => (
             <div key={group.id} className="flex flex-col items-center gap-1 w-full">
@@ -132,7 +132,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   // === MODO EXPANDIDO: completo ===
   return (
-    <aside className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-5 pt-4 transition-all overflow-hidden">
+    <aside className="w-64 h-[calc(100vh-4rem)] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-5 pt-4 transition-all overflow-hidden">
       <nav className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">
         {menuGroups.filter(g => temPermissao(g.permissao)).map((group) => (
           <div key={group.id} className="space-y-1">
