@@ -2,9 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { Moon, Sun, LogOut, User, ChevronDown } from "lucide-react";
+import { Moon, Sun, LogOut, User, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
-export function Topbar() {
+interface TopbarProps {
+  onToggleSidebar: () => void;
+  sidebarOpen: boolean;
+}
+
+export function Topbar({ onToggleSidebar, sidebarOpen }: TopbarProps) {
   const { data: session } = useSession();
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -49,8 +54,15 @@ export function Topbar() {
 
   return (
     <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 transition-all">
-      {/* Logo */}
+      {/* Logo + Toggle */}
       <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleSidebar}
+          className="text-slate-400 hover:text-blue-600 transition-colors p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+          title={sidebarOpen ? "Fechar menu" : "Abrir menu"}
+        >
+          {sidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
+        </button>
         <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
           Recanto <span className="text-blue-600">PLANALTO</span>
         </h2>
