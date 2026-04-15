@@ -184,7 +184,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all"
         >
           <PanelLeftClose size={18} />
-          <span className="text-[10px] font-black uppercase tracking-widest">Recolher</span>
+          <span className="text-[11px] font-black uppercase italic tracking-tighter">Recanto <span className="text-blue-600">Planalto</span></span>
         </button>
       </div>
     </aside>
