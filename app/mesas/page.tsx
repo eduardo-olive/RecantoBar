@@ -289,11 +289,11 @@ export default function MesasPage() {
   }
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-orange-600 pl-6 py-2 flex items-center justify-between">
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-orange-600 pl-4 py-1 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Mesas</h1>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Controle de mesas do estabelecimento</p>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Mesas</h1>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Controle de mesas do estabelecimento</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -322,7 +322,7 @@ export default function MesasPage() {
           return (
             <div
               key={mesa.id}
-              className={`relative p-5 rounded-[24px] border-2 transition-all ${
+              className={`relative p-5 rounded-xl border-2 transition-all ${
                 temComanda
                   ? "bg-amber-50 dark:bg-amber-950/20 border-amber-400 dark:border-amber-800"
                   : ocupada
@@ -421,7 +421,7 @@ export default function MesasPage() {
       {/* MODAL: ABRIR COMANDA */}
       {showAbrirComanda && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-[380px] rounded-[35px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[380px] rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-black uppercase italic dark:text-white">Abrir Comanda</h2>
               <button onClick={() => setShowAbrirComanda(null)} className="text-slate-400 hover:text-rose-500"><X size={20} /></button>
@@ -456,7 +456,7 @@ export default function MesasPage() {
       {/* MODAL: FORM MESA */}
       {showForm && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-[380px] rounded-[35px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[380px] rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-black uppercase italic dark:text-white">{editando ? "Editar Mesa" : "Nova Mesa"}</h2>
               <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-rose-500"><X size={20} /></button>
@@ -491,7 +491,7 @@ export default function MesasPage() {
       {/* MODAL: VER COMANDA */}
       {mesaSelecionada && comandaDetalhes && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-[500px] max-h-[80vh] rounded-[35px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[500px] max-h-[80vh] rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800 overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-xl font-black uppercase italic dark:text-white">Comanda — Mesa {mesaSelecionada.numero}</h2>
@@ -583,7 +583,7 @@ export default function MesasPage() {
       {/* MODAL: FECHAR COMANDA (PAGAMENTO) */}
       {fechandoComanda && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-[450px] rounded-[35px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[450px] rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-xl font-black uppercase italic dark:text-white">Fechar Comanda</h2>
@@ -684,7 +684,7 @@ export default function MesasPage() {
       {/* MODAL: CRIAR VÁRIAS MESAS */}
       {showLote && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-[380px] rounded-[35px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[380px] rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-black uppercase italic dark:text-white">Criar Várias Mesas</h2>
               <button onClick={() => setShowLote(false)} className="text-slate-400 hover:text-rose-500"><X size={20} /></button>

@@ -174,7 +174,7 @@ export default function VendasPDV() {
     <div className="flex flex-col gap-4 h-full p-1">
       <header className="border-l-4 border-blue-600 pl-4 py-1">
         <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-none">Vendas PDV</h1>
-        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Saída</p>
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Terminal de Saída</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -200,7 +200,7 @@ export default function VendasPDV() {
                   key={p.id}
                   disabled={semEstoque}
                   onClick={() => { setProdutoEmSelecao(p); setQuantidadeTemp(1); }}
-                  className={`group flex flex-col justify-between p-4 min-h-[110px] rounded-[24px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all ${semEstoque ? 'opacity-40 grayscale' : 'hover:border-blue-500 active:scale-[0.98]'}`}
+                  className={`group flex flex-col justify-between p-4 min-h-[110px] rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all ${semEstoque ? 'opacity-40 grayscale' : 'hover:border-blue-500 active:scale-[0.98]'}`}
                 >
                   <div className="text-left w-full">
                     <h3 className="font-black text-sm uppercase italic text-slate-800 dark:text-white leading-tight mb-1">{p.nome}</h3>
@@ -219,7 +219,7 @@ export default function VendasPDV() {
         </section>
 
         {/* CARRINHO DARK COMPACTO */}
-        <section className={`lg:col-span-5 rounded-[35px] p-6 text-white shadow-2xl relative overflow-hidden flex flex-col h-[600px] border ${modoMesa ? 'bg-[#1a1000] border-orange-500/20' : 'bg-[#0f172a] border-white/5'}`}>
+        <section className={`lg:col-span-5 rounded-3xl p-5 text-white shadow-2xl relative overflow-hidden flex flex-col h-[600px] border ${modoMesa ? 'bg-[#1a1000] border-orange-500/20' : 'bg-[#0f172a] border-white/5'}`}>
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-black uppercase italic tracking-tighter">
@@ -346,7 +346,7 @@ export default function VendasPDV() {
       {/* MODAL QUANTIDADE */}
       {produtoEmSelecao && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-[320px] rounded-[35px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-[320px] rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
             <h2 className="text-xl font-black uppercase italic dark:text-white mb-2 text-center leading-tight">{produtoEmSelecao.nome}</h2>
             <p className="text-center text-[9px] font-bold text-slate-400 mb-6 uppercase tracking-widest italic">ESTOQUE DISPONÍVEL: {produtoEmSelecao.estoque}</p>
 

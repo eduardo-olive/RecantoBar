@@ -53,8 +53,8 @@ export default function RelatorioVendas() {
       <div className="print:hidden space-y-8">
         <header className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Relatório Geral</h1>
-            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Histórico de movimentações</p>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Relatório Geral</h1>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-0.5">Histórico de movimentações</p>
           </div>
           <button onClick={imprimirPDF} className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest flex items-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all">
             <Printer size={18} /> Gerar PDF
@@ -63,16 +63,16 @@ export default function RelatorioVendas() {
 
         <DateRangeFilter onFilter={carregar} />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Vendas (Faturamento)</p>
             <h2 className="text-2xl font-black text-emerald-500 italic">R$ {totalSaidas.toFixed(2)}</h2>
           </div>
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Compras + Despesas</p>
             <h2 className="text-2xl font-black text-rose-500 italic">R$ {totalEntradas.toFixed(2)}</h2>
           </div>
-          <div className="bg-blue-600 p-6 rounded-3xl shadow-xl shadow-blue-500/20">
+          <div className="bg-blue-600 p-5 rounded-2xl shadow-xl shadow-blue-500/20">
             <p className="text-blue-100 font-bold uppercase text-[10px] tracking-widest">Saldo</p>
             <h2 className="text-2xl font-black text-white italic">R$ {saldoGeral.toFixed(2)}</h2>
           </div>
@@ -90,8 +90,8 @@ export default function RelatorioVendas() {
           </div>
         )}
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase text-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase text-sm">
             <FileText size={20} className="text-blue-600" /> Movimentações
           </div>
           <table className="w-full text-left">

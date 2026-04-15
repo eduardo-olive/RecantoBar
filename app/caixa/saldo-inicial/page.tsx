@@ -29,18 +29,18 @@ export default function SaldoInicialPage() {
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
       {/* Cabeçalho inspirado no seu layout de 'Produtos' */}
-      <div className="mb-10 border-l-4 border-blue-600 pl-4">
-        <h1 className="text-4xl font-black uppercase italic tracking-tighter">
+      <div className="mb-6 border-l-4 border-blue-600 pl-4">
+        <h1 className="text-2xl font-black uppercase italic tracking-tighter">
           Saldo <span className="text-blue-600">Inicial</span>
         </h1>
-        <p className="text-slate-500 uppercase text-xs font-bold tracking-widest mt-1">
+        <p className="text-slate-500 uppercase text-xs font-bold tracking-widest mt-0.5">
           Defina o capital disponível para compras e estoque
         </p>
       </div>
 
       {/* Card Centralizado estilo Dashboard */}
-      <div className="max-w-xl mx-auto bg-[#0f172a] border border-slate-800 rounded-[32px] p-8 shadow-2xl">
-        <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="max-w-xl mx-auto bg-[#0f172a] border border-slate-800 rounded-2xl p-5 shadow-2xl">
+        <form onSubmit={handleSubmit} className="space-y-5">
           
           <div className="flex items-center gap-5 mb-4">
             <div className="bg-blue-600/20 p-4 rounded-2xl">

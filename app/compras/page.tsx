@@ -88,13 +88,13 @@ export default function EntradaCompras() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full pb-10">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-full pb-8">
       
       {/* LADO ESQUERDO: SELEÇÃO DE PRODUTOS */}
-      <div className="lg:col-span-6 space-y-6">
-        <header className="border-l-4 border-emerald-500 pl-6 py-2">
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">Entrada de Estoque</h1>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Reposição e atualização de valores</p>
+      <div className="lg:col-span-6 space-y-4">
+        <header className="border-l-4 border-emerald-500 pl-4 py-1">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">Entrada de Estoque</h1>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Reposição e atualização de valores</p>
         </header>
 
         <div className="relative">
@@ -131,8 +131,8 @@ export default function EntradaCompras() {
 
       {/* LADO DIREITO: CARRINHO DE ENTRADA (DARK) */}
       <div className="lg:col-span-6">
-        <div className="bg-[#0f172a] rounded-[40px] p-8 text-white h-full flex flex-col shadow-2xl border border-white/5 relative overflow-hidden min-h-[600px]">
-          <header className="flex justify-between items-center mb-8">
+        <div className="bg-[#0f172a] rounded-2xl p-5 text-white h-full flex flex-col shadow-2xl border border-white/5 relative overflow-hidden min-h-[600px]">
+          <header className="flex justify-between items-center mb-5">
             <h2 className="text-2xl font-black uppercase italic tracking-tighter">LISTA DE ENTRADA</h2>
             <span className="text-[10px] font-black text-slate-500 uppercase italic">{carrinho.length} ITENS</span>
           </header>
@@ -163,7 +163,7 @@ export default function EntradaCompras() {
             )}
           </div>
 
-          <div className="mt-8 pt-6 border-t border-white/10 space-y-6">
+          <div className="mt-5 pt-4 border-t border-white/10 space-y-4">
             <div>
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">Investimento Total</p>
               <h3 className="text-4xl font-black italic text-emerald-500 tracking-tighter">
@@ -185,7 +185,7 @@ export default function EntradaCompras() {
       {/* MODAL DE VALORES */}
       {produtoEmSelecao && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-6 text-slate-900 dark:text-white">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[40px] p-10 shadow-2xl">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-10 shadow-2xl">
             <h2 className="text-2xl font-black uppercase italic mb-8 text-center">{produtoEmSelecao.nome}</h2>
             
             <div className="space-y-6">

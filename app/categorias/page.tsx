@@ -60,14 +60,14 @@ export default function CategoriasPage() {
   };
 
   return (
-    <div className="space-y-10 pb-10">
-      <header className="border-l-4 border-indigo-600 pl-6 py-2">
-        <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Categorias</h1>
-        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Gerencie os dados dinâmicos do sistema</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-indigo-600 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Categorias</h1>
+        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-0.5">Gerencie os dados dinâmicos do sistema</p>
       </header>
 
       {/* FORMULÁRIO */}
-      <section className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
+      <section className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <form onSubmit={handleAdd} className="flex gap-4">
           <input 
             type="text" 
@@ -88,15 +88,15 @@ export default function CategoriasPage() {
       </section>
 
       {/* LISTAGEM DINÂMICA */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {categorias.length === 0 ? (
-          <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[32px]">
+          <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
             <Inbox size={48} className="mb-4 opacity-20" />
             <p className="font-bold uppercase tracking-widest text-xs">Nenhuma categoria cadastrada</p>
           </div>
         ) : (
           categorias.map((cat) => (
-            <div key={cat.id} className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-600 transition-all">
+            <div key={cat.id} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-600 transition-all">
               <div className="flex items-center gap-4">
                 <Tag className="text-indigo-600" size={20} />
                 <h3 className="font-black text-slate-800 dark:text-white uppercase italic">{cat.nome}</h3>

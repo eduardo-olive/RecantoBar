@@ -341,13 +341,13 @@ export default function GuiaPage() {
   const [faseAberta, setFaseAberta] = useState<number | null>(1);
 
   return (
-    <div className="space-y-8 pb-10 max-w-5xl mx-auto">
+    <div className="space-y-5 pb-8 max-w-5xl mx-auto">
       {/* Header */}
-      <header className="border-l-4 border-blue-600 pl-6 py-2">
-        <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
+      <header className="border-l-4 border-blue-600 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
           Guia do Sistema
         </h1>
-        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">
+        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-0.5">
           Passo a passo completo — Do cadastro à venda
         </p>
       </header>
@@ -657,7 +657,7 @@ export default function GuiaPage() {
       </div>
 
       {/* Operações complementares */}
-      <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4">
         <h3 className="text-sm font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 flex items-center gap-2">
           <FileText size={16} className="text-blue-500" />
           Operações Complementares
@@ -747,7 +747,7 @@ export default function GuiaPage() {
           <ArrowRight size={14} className="text-slate-500 rotate-90" />
 
           {/* Split */}
-          <div className="flex gap-8 flex-wrap justify-center">
+          <div className="flex gap-5 flex-wrap justify-center">
             <div className="flex flex-col items-center gap-2">
               <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Modo Direto</span>
               <span className="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/20 text-emerald-400">Venda Direta</span>

@@ -225,13 +225,13 @@ export default function ProdutosPage() {
   };
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-emerald-500 pl-6 py-2 flex items-center justify-between">
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-emerald-500 pl-4 py-1 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
             {editandoId ? "Editar Produto" : "Produtos"}
           </h1>
-          <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Gestão de Inventário e Metas</p>
+          <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-0.5">Gestão de Inventário e Metas</p>
         </div>
         <button
           onClick={imprimirConferencia}
@@ -242,7 +242,7 @@ export default function ProdutosPage() {
       </header>
 
       {/* FORMULÁRIO DE CADASTRO/EDIÇÃO */}
-      <section className={`transition-all duration-300 p-8 rounded-[32px] border ${editandoId ? 'bg-blue-50/50 border-blue-200 shadow-inner' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`}>
+      <section className={`transition-all duration-300 p-5 rounded-2xl border ${editandoId ? 'bg-blue-50/50 border-blue-200 shadow-inner' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <input 
@@ -339,7 +339,7 @@ export default function ProdutosPage() {
       </div>
 
       {/* LISTAGEM EM TABELA */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-950 text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">

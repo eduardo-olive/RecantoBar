@@ -97,12 +97,12 @@ export default function CozinhaPage() {
   }
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-5 pb-8">
       {/* HEADER */}
-      <header className="border-l-4 border-amber-600 pl-6 py-2 flex items-center justify-between">
+      <header className="border-l-4 border-amber-600 pl-4 py-1 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Cozinha</h1>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Painel de preparo</p>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Cozinha</h1>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Painel de preparo</p>
         </div>
         <div className="flex items-center gap-4">
           {/* Contadores */}
@@ -130,11 +130,11 @@ export default function CozinhaPage() {
           <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-1">Novos pedidos aparecerão aqui automaticamente</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {Object.entries(porMesa).map(([mesa, mesaItens]) => (
             <div
               key={mesa}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] overflow-hidden shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm"
             >
               {/* Header da mesa */}
               <div className="bg-slate-50 dark:bg-slate-950 px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -244,11 +244,11 @@ export default function CozinhaPage() {
             {entregues.length === 0 ? (
               <p className="text-center text-slate-400 font-bold uppercase text-xs py-8">Nenhum item entregue hoje</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {Object.entries(entreguesPorMesa).map(([mesa, mesaItens]) => (
                   <div
                     key={mesa}
-                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] overflow-hidden shadow-sm opacity-70"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm opacity-70"
                   >
                     <div className="bg-slate-50 dark:bg-slate-950 px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                       <h3 className="font-black uppercase italic text-sm text-slate-800 dark:text-white tracking-tighter">{mesa}</h3>

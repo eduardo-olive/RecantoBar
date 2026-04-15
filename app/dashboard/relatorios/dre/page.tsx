@@ -35,27 +35,27 @@ export default function DREPage() {
   );
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-violet-600 pl-6 py-2">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">DRE - Demonstrativo de Resultado</h1>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Visão completa da performance financeira</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-violet-600 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">DRE - Demonstrativo de Resultado</h1>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Visão completa da performance financeira</p>
       </header>
 
       <DateRangeFilter onFilter={carregar} />
 
       {/* CARDS RESUMO */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-emerald-500 p-6 rounded-[32px] shadow-lg text-white">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-emerald-500 p-5 rounded-2xl shadow-lg text-white">
           <p className="text-emerald-100 font-black uppercase text-[10px] tracking-widest">Receita Bruta</p>
           <p className="text-3xl font-black italic mt-2">R$ {dre.receitaBruta.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
           <TrendingUp className="mt-2 text-emerald-200" size={20} />
         </div>
-        <div className={`p-6 rounded-[32px] shadow-lg text-white ${dre.resultadoLiquido >= 0 ? "bg-blue-600" : "bg-rose-500"}`}>
+        <div className={`p-5 rounded-2xl shadow-lg text-white ${dre.resultadoLiquido >= 0 ? "bg-blue-600" : "bg-rose-500"}`}>
           <p className="font-black uppercase text-[10px] tracking-widest opacity-70">Resultado Líquido</p>
           <p className="text-3xl font-black italic mt-2">R$ {dre.resultadoLiquido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
           {dre.resultadoLiquido >= 0 ? <TrendingUp className="mt-2 opacity-50" size={20} /> : <TrendingDown className="mt-2 opacity-50" size={20} />}
         </div>
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
           <p className="text-slate-500 font-black uppercase text-[10px] tracking-widest">Margens</p>
           <div className="mt-3 space-y-2">
             <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Bruta:</span><span className="font-black text-sm text-blue-600">{dre.margemBruta}%</span></div>
@@ -65,8 +65,8 @@ export default function DREPage() {
       </div>
 
       {/* DRE DETALHADO */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
           <FileText size={18} className="text-violet-600" />
           <h2 className="font-black uppercase text-sm text-slate-800 dark:text-white tracking-tighter">Demonstrativo Detalhado</h2>
         </div>

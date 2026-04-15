@@ -70,14 +70,14 @@ export default function DespesasPage() {
   const totalDespesas = despesas.reduce((acc, d) => acc + d.valor, 0);
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-rose-500 pl-6 py-2">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Despesas Operacionais</h1>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Registre aluguel, contas, salários e outras despesas</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-rose-500 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Despesas Operacionais</h1>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Registre aluguel, contas, salários e outras despesas</p>
       </header>
 
       {/* FORMULARIO */}
-      <section className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
+      <section className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <form onSubmit={registrar} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Categoria</label>
@@ -106,7 +106,7 @@ export default function DespesasPage() {
       </section>
 
       {/* RESUMO */}
-      <div className="bg-rose-500 p-6 rounded-[32px] shadow-lg shadow-rose-500/20 text-white flex justify-between items-center">
+      <div className="bg-rose-500 p-4 rounded-2xl shadow-lg shadow-rose-500/20 text-white flex justify-between items-center">
         <div>
           <p className="text-rose-200 font-black uppercase text-[10px] tracking-widest">Total de Despesas</p>
           <p className="text-3xl font-black italic">R$ {totalDespesas.toFixed(2)}</p>
@@ -115,8 +115,8 @@ export default function DespesasPage() {
       </div>
 
       {/* HISTORICO */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
           <History size={18} className="text-rose-500" />
           <h2 className="font-black uppercase text-sm text-slate-800 dark:text-white tracking-tighter">Histórico de Despesas</h2>
         </div>

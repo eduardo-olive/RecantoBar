@@ -84,15 +84,15 @@ export default function CaixaPage() {
   }
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-blue-600 pl-6 py-2">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Gestão de Caixa</h1>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Controle de abertura, fechamento, sangria e suprimento</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-blue-600 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Gestão de Caixa</h1>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Controle de abertura, fechamento, sangria e suprimento</p>
       </header>
 
       {/* CAIXA ATUAL */}
       {caixaAtual ? (
-        <div className="bg-blue-600 p-8 rounded-[32px] shadow-lg shadow-blue-500/20 text-white">
+        <div className="bg-blue-600 p-5 rounded-2xl shadow-lg shadow-blue-500/20 text-white">
           <div className="flex justify-between items-start mb-6">
             <div>
               <p className="text-blue-200 font-black uppercase text-[10px] tracking-widest">Caixa Aberto</p>
@@ -100,7 +100,7 @@ export default function CaixaPage() {
             </div>
             <Banknote size={28} />
           </div>
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
               <p className="text-blue-200 text-[10px] font-bold uppercase tracking-widest">Valor Inicial</p>
               <p className="text-2xl font-black italic">R$ {Number(caixaAtual.valor_inicial).toFixed(2)}</p>
@@ -123,7 +123,7 @@ export default function CaixaPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-slate-100 dark:bg-slate-900 p-10 rounded-[32px] border border-slate-200 dark:border-slate-800 text-center">
+        <div className="bg-slate-100 dark:bg-slate-900 p-10 rounded-2xl border border-slate-200 dark:border-slate-800 text-center">
           <AlertCircle size={40} className="mx-auto text-amber-500 mb-4" />
           <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase">Nenhum Caixa Aberto</h3>
           <p className="text-slate-500 text-sm mb-6">Abra o caixa para iniciar as operações do dia</p>
@@ -134,8 +134,8 @@ export default function CaixaPage() {
       )}
 
       {/* HISTORICO */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
           <History size={18} className="text-blue-600" />
           <h2 className="font-black uppercase text-sm text-slate-800 dark:text-white tracking-tighter">Histórico de Caixas</h2>
         </div>
@@ -179,7 +179,7 @@ export default function CaixaPage() {
       {/* MODAL */}
       {modal && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[32px] p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
             <h2 className="text-xl font-black uppercase italic dark:text-white mb-6 text-center">
               {modal === "sangria" && "Sangria de Caixa"}
               {modal === "suprimento" && "Suprimento de Caixa"}

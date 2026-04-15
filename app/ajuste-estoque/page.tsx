@@ -87,10 +87,10 @@ export default function AjusteEstoquePage() {
   }
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-indigo-600 pl-6 py-2">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Ajuste de Estoque</h1>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Corrija estoque, preço de custo e preço de venda</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-indigo-600 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Ajuste de Estoque</h1>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Corrija estoque, preço de custo e preço de venda</p>
       </header>
 
       {/* BARRA DE BUSCA + SALVAR */}
@@ -125,8 +125,8 @@ export default function AjusteEstoquePage() {
       </div>
 
       {/* TABELA */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
           <ClipboardCheck size={18} className="text-indigo-600" />
           <h2 className="font-black uppercase text-sm text-slate-800 dark:text-white tracking-tighter">Produtos ({produtosFiltrados.length})</h2>
         </div>

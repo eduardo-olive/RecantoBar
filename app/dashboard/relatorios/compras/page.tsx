@@ -64,8 +64,8 @@ export default function RelatorioCompras() {
       <div className="print:hidden space-y-8">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Sugestão de Compras</h1>
-            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Reposição baseada em estoque crítico</p>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Sugestão de Compras</h1>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-0.5">Reposição baseada em estoque crítico</p>
           </div>
           <div className="flex gap-3 w-full md:w-auto">
              <Link href="/dashboard" className="flex items-center gap-2 text-slate-500 font-bold hover:text-blue-600 transition-all text-xs uppercase bg-white dark:bg-slate-900 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800">
@@ -78,24 +78,24 @@ export default function RelatorioCompras() {
         </header>
 
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
             <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Itens Críticos</p>
             <h2 className="text-2xl font-black text-rose-500 italic mt-1">{totalItensCriticos} PRODUTOS</h2>
           </div>
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
             <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Unidades a Repor</p>
             <h2 className="text-2xl font-black text-blue-500 italic mt-1">+{totalUnidadesComprar} UN</h2>
           </div>
-          <div className={`p-6 rounded-3xl shadow-xl transition-colors ${totalItensCriticos > 0 ? 'bg-rose-600 shadow-rose-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>
+          <div className={`p-5 rounded-2xl shadow-xl transition-colors ${totalItensCriticos > 0 ? 'bg-rose-600 shadow-rose-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>
             <p className="text-white/60 font-bold uppercase text-[10px] tracking-widest">Status Geral</p>
             <h2 className="text-2xl font-black text-white italic mt-1">{totalItensCriticos > 0 ? 'AÇÃO NECESSÁRIA' : 'ESTOQUE OK'}</h2>
           </div>
         </div>
 
         {/* Tabela de Sugestões */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase text-sm italic">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase text-sm italic">
             <ShoppingCart size={20} className="text-blue-600" />
             Itens para Cotação
           </div>

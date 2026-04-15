@@ -53,23 +53,23 @@ export default function PerdasPage() {
   };
 
   return (
-    <div className="space-y-10 min-h-screen pb-20">
-      <header className="border-l-4 border-amber-600 dark:border-amber-500 pl-6 py-2">
+    <div className="space-y-5 min-h-screen pb-8">
+      <header className="border-l-4 border-amber-600 dark:border-amber-500 pl-4 py-1">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-amber-600 dark:bg-amber-500 rounded-lg shadow-lg">
             <AlertTriangle className="text-white" size={28} />
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white uppercase">
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase">
             Registro de Perdas
           </h1>
         </div>
-        <p className="text-slate-500 dark:text-gray-400 mt-2 text-lg font-medium italic">
+        <p className="text-slate-500 dark:text-gray-400 mt-0.5 text-lg font-medium italic">
           Controle de quebras, vencimentos e consumo interno
         </p>
       </header>
 
-      <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800">
-        <form onSubmit={handleConfirmarPerda} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800">
+        <form onSubmit={handleConfirmarPerda} className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col gap-2">
             <label className="text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest">Produto</label>
             <select
@@ -113,7 +113,7 @@ export default function PerdasPage() {
       </section>
 
       <section className="bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
-        <div className="p-6 border-b border-slate-800 flex items-center gap-2">
+        <div className="p-4 border-b border-slate-800 flex items-center gap-2">
           <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
           <h2 className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-2">
             <History size={20} className="text-slate-400" /> Histórico de Ocorrências

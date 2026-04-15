@@ -168,15 +168,15 @@ export default function TrocasPage() {
   };
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-violet-600 pl-6 py-2">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Trocas</h1>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Troque produtos de vendas realizadas hoje</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-violet-600 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Trocas</h1>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Troque produtos de vendas realizadas hoje</p>
       </header>
 
       {/* PEDIDOS DO DIA */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Search size={18} className="text-violet-600" />
             <h2 className="font-black uppercase text-sm text-slate-800 dark:text-white tracking-tighter">Pedidos do Dia</h2>
@@ -241,12 +241,12 @@ export default function TrocasPage() {
 
       {/* FORMULÁRIO DE TROCA */}
       {itemSelecionado && (
-        <section className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border-2 border-violet-500 shadow-lg shadow-violet-500/10">
+        <section className="bg-white dark:bg-slate-900 p-5 rounded-2xl border-2 border-violet-500 shadow-lg shadow-violet-500/10">
           <h2 className="font-black uppercase text-sm text-violet-600 tracking-tighter mb-6 flex items-center gap-2">
             <ArrowRightLeft size={18} /> Registrar Troca
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Produto original */}
             <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
               <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-2">Devolvendo</p>
@@ -404,8 +404,8 @@ export default function TrocasPage() {
       )}
 
       {/* HISTÓRICO */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
           <History size={18} className="text-violet-600" />
           <h2 className="font-black uppercase text-sm text-slate-800 dark:text-white tracking-tighter">Trocas do Dia</h2>
         </div>

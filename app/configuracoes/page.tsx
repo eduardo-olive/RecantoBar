@@ -74,10 +74,10 @@ export default function ConfiguracoesPage() {
   }
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-blue-600 pl-6 py-2">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Perfis e Permissões</h1>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Configure os níveis de acesso do sistema</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-blue-600 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Perfis e Permissões</h1>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Configure os níveis de acesso do sistema</p>
       </header>
 
       <button onClick={() => { limparForm(); setShowForm(!showForm); }}
@@ -86,7 +86,7 @@ export default function ConfiguracoesPage() {
       </button>
 
       {showForm && (
-        <section className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <section className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="font-black uppercase text-sm text-slate-700 dark:text-white mb-4">{editId ? "Editar Perfil" : "Novo Perfil"}</h3>
           <form onSubmit={salvar} className="space-y-5">
             <div className="flex flex-col gap-2 max-w-md">
@@ -126,9 +126,9 @@ export default function ConfiguracoesPage() {
       )}
 
       {/* LISTA DE PERFIS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {perfis.map((p: any) => (
-          <div key={p.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] p-6 shadow-sm">
+          <div key={p.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-600/10 p-2 rounded-lg">

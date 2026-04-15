@@ -76,23 +76,23 @@ export default function ContasPage() {
   };
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="border-l-4 border-amber-500 pl-6 py-2">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Contas a Pagar / Receber</h1>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Controle de obrigações e recebimentos</p>
+    <div className="space-y-5 pb-8">
+      <header className="border-l-4 border-amber-500 pl-4 py-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">Contas a Pagar / Receber</h1>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Controle de obrigações e recebimentos</p>
       </header>
 
       {/* RESUMO */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-rose-500 p-6 rounded-[32px] shadow-lg text-white">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-rose-500 p-5 rounded-2xl shadow-lg text-white">
           <p className="text-rose-200 font-black uppercase text-[10px] tracking-widest">A Pagar (Pendente)</p>
           <p className="text-3xl font-black italic mt-2">R$ {dados.resumo.totalPagar.toFixed(2)}</p>
         </div>
-        <div className="bg-emerald-500 p-6 rounded-[32px] shadow-lg text-white">
+        <div className="bg-emerald-500 p-5 rounded-2xl shadow-lg text-white">
           <p className="text-emerald-200 font-black uppercase text-[10px] tracking-widest">A Receber (Pendente)</p>
           <p className="text-3xl font-black italic mt-2">R$ {dados.resumo.totalReceber.toFixed(2)}</p>
         </div>
-        <div className="bg-blue-600 p-6 rounded-[32px] shadow-lg text-white">
+        <div className="bg-blue-600 p-5 rounded-2xl shadow-lg text-white">
           <p className="text-blue-200 font-black uppercase text-[10px] tracking-widest">Saldo Previsto</p>
           <p className="text-3xl font-black italic mt-2">R$ {(dados.resumo.totalReceber - dados.resumo.totalPagar).toFixed(2)}</p>
         </div>
@@ -122,7 +122,7 @@ export default function ContasPage() {
 
       {/* FORM NOVA CONTA */}
       {showForm && (
-        <section className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <section className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <form onSubmit={criarConta} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Tipo</label>
@@ -155,7 +155,7 @@ export default function ContasPage() {
       )}
 
       {/* LISTA */}
-      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
+      <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-950 text-slate-500 text-[10px] font-black uppercase tracking-widest">
